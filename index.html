@@ -1,734 +1,213 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>사주왕</title>
-  <meta name="description" content="사주왕 - 사주 찐덕후가 만든 사주 꿀팁왕" />
+<meta charset="UTF-8">
+<title>사주왕 - AI 사주 분석 & 만세력</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
+<style>
+    body {
+        margin:0;
+        font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        background: linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+        color:white;
+        min-height: 100vh;
+    }
+    header {
+        padding:40px 20px 20px;
+        text-align:center;
+        font-size:32px;
+        font-weight:bold;
+        letter-spacing: -1px;
+    }
+    .container {
+        max-width:500px;
+        margin:0 auto 40px;
+        background: rgba(255,255,255,0.08);
+        padding:30px;
+        border-radius:24px;
+        box-shadow:0 10px 30px rgba(0,0,0,0.5);
+        backdrop-filter: blur(10px);
+    }
+    h2 { font-size: 20px; text-align: center; margin-bottom: 25px; color: #ccc; }
+    input, button, select {
+        width: 100%;
+        padding: 14px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+    input { background: rgba(255,255,255,0.9); color: #333; }
+    button {
+        background: linear-gradient(to right, #ffcc00, #ffb300);
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    button:active { transform: scale(0.98); }
+    
+    /* 만세력 테이블 스타일 */
+    .manseryeok-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin: 20px 0;
+        text-align: center;
+    }
+    .pillar {
+        background: rgba(255,255,255,0.1);
+        padding: 10px 5px;
+        border-radius: 8px;
+    }
+    .pillar-label { font-size: 11px; color: #aaa; margin-bottom: 5px; }
+    .gan, .zhi { font-size: 20px; font-weight: bold; display: block; margin: 2px 0; }
+    .hangul { font-size: 12px; opacity: 0.7; }
 
-  <!-- ✅ (선택) 링크 미리보기: 도메인/이미지 경로만 너 걸로 바꾸면 됨 -->
-  <!--
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="사주왕" />
-  <meta property="og:title" content="사주왕 — 오늘 운세·궁합·사주요약 🔮" />
-  <meta property="og:description" content="사주를 재밌게! 오늘 운세/궁합/사주 요약을 빠르게 확인." />
-  <meta property="og:url" content="https://sajuwang.co.kr/" />
-  <meta property="og:image" content="https://sajuwang.co.kr/assets/og-sajuwang.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://sajuwang.co.kr/assets/og-sajuwang.png" />
-  -->
+    /* 오행 색상 */
+    .wood { color: #4ade80; }  /* 목 */
+    .fire { color: #fb7185; }  /* 화 */
+    .earth { color: #fbbf24; } /* 토 */
+    .metal { color: #e5e7eb; } /* 금 */
+    .water { color: #60a5fa; } /* 수 */
 
-  <style>
-    :root{
-      --bg:#ffffff;
-      --grid:#d7dbe5;
-      --pink:#ff6aa8;
-      --pink2:#ff3f94;
-      --ink:#1d1d1f;
-      --muted:#6b7280;
-      --card:rgba(255,255,255,.72);
-      --shadow: 0 18px 60px rgba(0,0,0,.12);
-      --stroke: rgba(0,0,0,.10);
-      --navH: 78px;
-      --radius: 22px;
+    .result {
+        margin-top:20px;
+        background: rgba(0,0,0,0.4);
+        padding:20px;
+        border-radius:15px;
+        display:none;
+        border: 1px solid rgba(255,255,255,0.1);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-        "Noto Sans KR","Apple SD Gothic Neo", Arial, "Helvetica Neue", sans-serif;
-      color:var(--ink);
-      background: var(--bg);
+    .pay {
+        margin-top:20px;
+        background:#00e0ff;
+        color:black;
+        font-weight:bold;
     }
-
-    .stage{
-      min-height:100svh;
-      display:grid;
-      place-items:center;
-      padding:18px;
-      background:
-        radial-gradient(700px 300px at 50% -10%, rgba(255,106,168,.22), transparent 60%),
-        radial-gradient(650px 350px at 75% 20%, rgba(255,208,230,.35), transparent 60%),
-        radial-gradient(700px 420px at 35% 40%, rgba(190,227,255,.35), transparent 60%),
-        #fff;
+    .footer {
+        text-align:center;
+        opacity:0.4;
+        padding-bottom: 40px;
+        font-size:12px;
     }
-
-    .phone{
-      width:min(420px, 92vw);
-      height:min(880px, 92svh);
-      border-radius: 34px;
-      position:relative;
-      overflow:hidden;
-      box-shadow: 0 30px 100px rgba(0,0,0,.18);
-      border:1px solid rgba(0,0,0,.06);
-      background:#fff;
-    }
-
-    .paper{
-      position:absolute; inset:0;
-      padding-bottom: var(--navH);
-      background:
-        radial-gradient(220px 220px at 50% 42%, rgba(255,106,168,.20), transparent 60%),
-        radial-gradient(220px 220px at 65% 70%, rgba(255,106,168,.12), transparent 60%),
-        linear-gradient(var(--grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-        #fff;
-      background-size: 34px 34px, 34px 34px, 34px 34px, 34px 34px, auto;
-      background-position: 0 0, 0 0, 0 0, 0 0, center;
-    }
-
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:5;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:14px 16px 10px;
-      background: linear-gradient(to bottom, rgba(255,255,255,.92), rgba(255,255,255,0));
-      backdrop-filter: blur(8px);
-    }
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.75);
-      border:1px solid rgba(0,0,0,.06);
-      box-shadow: 0 8px 24px rgba(0,0,0,.08);
-      font-weight:900;
-      letter-spacing:-.3px;
-    }
-    .chip .dot{
-      width:10px; height:10px; border-radius:99px;
-      background: linear-gradient(135deg, var(--pink), #ffd0e7);
-      box-shadow: 0 0 0 4px rgba(255,106,168,.16);
-    }
-    .icons{
-      display:flex; gap:10px; align-items:center;
-      color:#ff6aa8;
-      font-size:18px;
-      font-weight:900;
-      user-select:none;
-    }
-    .iconBtn{
-      min-width:34px; height:34px;
-      padding:0 10px;
-      display:inline-flex; gap:8px;
-      align-items:center; justify-content:center;
-      border-radius:12px;
-      border:1px solid rgba(0,0,0,.06);
-      background: rgba(255,255,255,.75);
-      box-shadow: 0 8px 24px rgba(0,0,0,.08);
-      cursor:pointer;
-      font-weight:1000;
-      color:#ff4f9c;
-    }
-    .iconBtn.small{
-      min-width:34px; padding:0; width:34px;
-    }
-
-    .content{
-      position:relative;
-      padding: 6px 18px 18px;
-      height:100%;
-      overflow:auto;
-      scrollbar-width: none;
-    }
-    .content::-webkit-scrollbar{display:none}
-
-    .center{ text-align:center; }
-
-    .question{
-      margin-top: 10px;
-      font-weight:900;
-      color:#ff5b9f;
-      letter-spacing:-.4px;
-      font-size: 18px;
-    }
-    .dividerLine{
-      width:2px; height:44px;
-      background: rgba(255,90,155,.55);
-      margin: 14px auto 10px;
-      border-radius:99px;
-    }
-    .subline{
-      margin: 4px 0 0;
-      font-weight:900;
-      color:#ff5b9f;
-      letter-spacing:-.4px;
-      font-size: 18px;
-      line-height:1.35;
-    }
-    .scribble{
-      display:inline-block;
-      position:relative;
-      padding:0 2px;
-    }
-    .scribble:after{
-      content:"";
-      position:absolute;
-      left:-6px; right:-6px; bottom:-2px;
-      height:12px;
-      background: rgba(255,200,0,.40);
-      border-radius: 999px;
-      transform: rotate(-2deg);
-      z-index:-1;
-    }
-    .circleMark{
-      display:inline-block;
-      position:relative;
-      padding:0 3px;
-    }
-    .circleMark:before{
-      content:"";
-      position:absolute;
-      left:-14px; top:-10px;
-      width: calc(100% + 28px);
-      height: calc(100% + 18px);
-      border: 2px solid rgba(255,80,150,.55);
-      border-radius: 999px;
-      transform: rotate(-6deg);
-      pointer-events:none;
-    }
-
-    .heroTitle{
-      margin: 26px 0 10px;
-      position:relative;
-      display:grid;
-      place-items:center;
-    }
-    .bubble{
-      font-size: 74px;
-      line-height: 1;
-      font-weight: 1000;
-      letter-spacing: -2px;
-      color: #ff6fb1;
-      text-shadow:
-        0 10px 0 rgba(255,255,255,.9),
-        0 16px 30px rgba(255,106,168,.35),
-        0 2px 0 rgba(0,0,0,.06);
-      -webkit-text-stroke: 2px rgba(255,255,255,.85);
-      filter: drop-shadow(0 16px 22px rgba(0,0,0,.10));
-      position:relative;
-    }
-    .bubble:before{
-      content:"SAJU";
-      position:absolute;
-      transform: translate(6px, 7px);
-      color: rgba(255,60,140,.45);
-      z-index:-1;
-      -webkit-text-stroke: 0;
-      filter: blur(.2px);
-    }
-    .labelPill{
-      position:absolute;
-      top:-18px;
-      padding:10px 16px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.72));
-      border:1px solid rgba(0,0,0,.06);
-      box-shadow: 0 12px 40px rgba(0,0,0,.10);
-      font-weight: 1000;
-      color:#ff5aa2;
-      letter-spacing:-.4px;
-    }
-
-    .stickers{ position:absolute; inset:0; pointer-events:none; }
-    .st{ position:absolute; filter: drop-shadow(0 14px 18px rgba(0,0,0,.10)); opacity:.95; }
-    .st.star{
-      width:46px; height:46px;
-      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(210,210,230,.65));
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-      border:1px solid rgba(0,0,0,.06);
-    }
-    .st.heart{
-      width:28px; height:28px;
-      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,120,175,.75));
-      clip-path: path("M14 26 C-2 14 4 2 14 8 C24 2 30 14 14 26 Z");
-      border:1px solid rgba(0,0,0,.06);
-    }
-
-    .cta{
-      margin: 18px auto 10px;
-      width:min(340px, 92%);
-      border-radius: 22px;
-      background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.65));
-      border:1px solid rgba(0,0,0,.06);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      text-align:left;
-    }
-    .cta h3{ margin:0 0 6px; font-size:16px; letter-spacing:-.4px; }
-    .cta p{ margin:0 0 10px; color:var(--muted); font-weight:700; font-size:12.5px; line-height:1.4; }
-    .row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:12px 12px;
-      border-radius: 16px;
-      border:1px solid rgba(0,0,0,.08);
-      font-weight:1000;
-      cursor:pointer;
-      user-select:none;
-      transition: transform .08s ease, filter .15s ease;
-      background: rgba(255,255,255,.8);
-    }
-    .btn:active{ transform: translateY(1px) scale(.99); }
-    .btn.primary{
-      background: linear-gradient(135deg, var(--pink), #ffd0e7);
-      border:0;
-      color:#fff;
-      box-shadow: 0 14px 40px rgba(255,106,168,.35);
-    }
-    .btn.ghost{ color:#ff4f9c; background: rgba(255,255,255,.85); }
-
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px; border-radius:999px;
-      border:1px solid rgba(0,0,0,.06);
-      background: rgba(255,255,255,.75);
-      font-weight:1000;
-      color:#ff4f9c;
-    }
-    .pill{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(0,0,0,.08);
-      background: rgba(255,255,255,.75);
-      color: var(--muted);
-      font-weight:900;
-      font-size:12px;
-    }
-
-    .bottomNav{
-      position:absolute;
-      left:0; right:0; bottom:0;
-      height: var(--navH);
-      background: rgba(255,255,255,.92);
-      border-top: 1px solid rgba(0,0,0,.08);
-      backdrop-filter: blur(8px);
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      padding: 10px 10px 12px;
-      z-index:6;
-    }
-    .navItem{
-      display:grid;
-      place-items:center;
-      gap:6px;
-      border-radius:16px;
-      font-weight:1000;
-      color:#6b7280;
-      cursor:pointer;
-      user-select:none;
-    }
-    .navItem .ico{
-      width:28px; height:28px;
-      display:grid; place-items:center;
-      border-radius:12px;
-      border:1px solid rgba(0,0,0,.06);
-      background: rgba(255,255,255,.85);
-    }
-    .navItem.active{ color:#ff4f9c; }
-    .navItem.active .ico{
-      background: rgba(255,106,168,.14);
-      border-color: rgba(255,106,168,.25);
-    }
-
-    /* ===== Modal ===== */
-    .overlay{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.35);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:9999;
-    }
-    .modal{
-      width:min(420px, 92vw);
-      border-radius: 22px;
-      background: rgba(255,255,255,.92);
-      border:1px solid rgba(0,0,0,.08);
-      box-shadow: 0 30px 90px rgba(0,0,0,.25);
-      overflow:hidden;
-    }
-    .modalHead{
-      padding:14px 14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom:1px solid rgba(0,0,0,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
-    }
-    .modalHead b{ font-weight:1000; letter-spacing:-.3px; }
-    .xbtn{
-      width:36px; height:36px;
-      border-radius:12px;
-      border:1px solid rgba(0,0,0,.10);
-      background:#fff;
-      cursor:pointer;
-      font-weight:1000;
-    }
-    .modalBody{ padding:14px; }
-    .field{ margin:10px 0; }
-    .field label{
-      display:block;
-      font-size:12px;
-      font-weight:1000;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-    .field input, .field select{
-      width:100%;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.10);
-      background: rgba(255,255,255,.90);
-      outline:none;
-      font-weight:800;
-    }
-    .field input:focus, .field select:focus{
-      border-color: rgba(255,106,168,.45);
-      box-shadow: 0 0 0 4px rgba(255,106,168,.16);
-    }
-    .muted{ color:var(--muted); font-size:12px; font-weight:700; line-height:1.4; }
-    .danger{ color:#d61f45; font-weight:900; font-size:12px; display:none; margin-top:8px; }
-    .success{
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.08);
-      background: rgba(255,106,168,.10);
-      color:#ff3f94;
-      font-weight:1000;
-      display:none;
-      margin-top:10px;
-    }
-    .hr{ height:1px; background: rgba(0,0,0,.08); margin:12px 0; }
-    .right{ text-align:right; }
-    .fullBtn{ width:100%; }
-  </style>
+</style>
 </head>
-
 <body>
-  <div class="stage">
-    <div class="phone" role="application" aria-label="사주왕 데모 화면">
-      <div class="paper">
 
-        <div class="topbar">
-          <div class="chip"><span class="dot"></span>사주왕</div>
-          <div class="icons">
-            <button class="iconBtn small" id="btnLoginTop" title="로그인">👤</button>
-            <button class="iconBtn small" id="btnPayTop" title="결제">💳</button>
-            <button class="iconBtn small" title="메뉴">≡</button>
-          </div>
-        </div>
+<header>🔮 사주왕 AI</header>
 
-        <div class="content" id="screen">
-          <div class="stickers" aria-hidden="true">
-            <div class="st star" style="left: 78%; top: 120px; transform: rotate(12deg);"></div>
-            <div class="st star" style="left: 12%; top: 420px; transform: rotate(-18deg) scale(.85);"></div>
-            <div class="st heart" style="left: 18%; top: 360px; transform: rotate(8deg);"></div>
-            <div class="st star" style="left: 72%; top: 520px; transform: rotate(-6deg) scale(.92);"></div>
-          </div>
+<div class="container">
+    <h2>운명의 흐름을 분석합니다</h2>
+    <input id="name" placeholder="이름 입력">
+    <input type="text" id="birth" placeholder="생년월일 8자리 (19900101)">
+    <select id="time">
+        <option value="">태어난 시간 선택 (모름)</option>
+        <option value="00">자시 (23:30~01:29)</option>
+        <option value="02">축시 (01:30~03:29)</option>
+        <option value="04">인시 (03:30~05:29)</option>
+        <option value="06">묘시 (05:30~07:29)</option>
+        <option value="08">진시 (07:30~09:29)</option>
+        <option value="10">사시 (09:30~11:29)</option>
+        <option value="12">오시 (11:30~13:29)</option>
+        <option value="14">미시 (13:30~15:29)</option>
+        <option value="16">신시 (15:30~17:29)</option>
+        <option value="18">유시 (17:30~19:29)</option>
+        <option value="20">술시 (19:30~21:29)</option>
+        <option value="22">해시 (21:30~23:29)</option>
+    </select>
+    <button onclick="analyze()">실시간 AI 사주 분석</button>
 
-          <div class="center">
-            <div class="question" id="headline">사주 해설은 왜 늘 불안하고 비쌀까?</div>
-            <div class="dividerLine"></div>
-
-            <div class="subline">
-              찾다가 없어서 직접 만들었어요<br/>
-              <span class="circleMark">사주 찐덕후</span>가 만든 <span class="scribble">사주 꿀팁왕</span> 어플
+    <div class="result" id="result">
+        <h3 id="resultTitle">📜 분석 결과</h3>
+        
+        <div class="manseryeok-grid" id="manseryeok">
             </div>
 
-            <div class="heroTitle" aria-label="타이틀">
-              <div class="labelPill">사주왕</div>
-              <div class="bubble">SAJU</div>
-            </div>
-
-            <div class="cta">
-              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-                <div>
-                  <h3>오늘의 사주를 시작할까요?</h3>
-                  <p>로그인 후 990원 결제로 “1회 해설”을 열 수 있어요. (데모)</p>
-                </div>
-                <div class="pill" id="statePill">미로그인</div>
-              </div>
-
-              <div class="row" style="margin-top:10px;">
-                <button class="btn ghost" type="button" id="btnLogin">👤 로그인</button>
-                <button class="btn primary" type="button" id="btnPay">💳 990원 결제하기</button>
-              </div>
-
-              <div class="success" id="paidBanner">✅ 결제 완료(데모)! 이제 “사주 보기”를 열 수 있어요.</div>
-
-              <div class="hr"></div>
-
-              <button class="btn primary fullBtn" type="button" id="btnSajuOpen">🔮 사주 보기</button>
-              <div class="muted" style="margin-top:8px;">
-                * 실제 결제는 토스/카카오페이/Stripe 등 PG 연동이 필요합니다.
-              </div>
-            </div>
-
-            <div class="muted" style="max-width:340px; margin:12px auto 0;">
-              링크 미리보기(썸네일)는 <b>og:image</b> 설정 + 1200×630 이미지 업로드가 필요해요.
-            </div>
-
-            <div style="height:24px;"></div>
-          </div>
-        </div>
-
-        <nav class="bottomNav" aria-label="하단 네비게이션">
-          <div class="navItem active" data-tab="saju">
-            <div class="ico">🐯</div>
-            <div style="font-size:12px;">사주</div>
-          </div>
-          <div class="navItem" data-tab="love">
-            <div class="ico">🤍</div>
-            <div style="font-size:12px;">궁합</div>
-          </div>
-          <div class="navItem" data-tab="today">
-            <div class="ico">✨</div>
-            <div style="font-size:12px;">운세</div>
-          </div>
-        </nav>
-      </div>
+        <p id="text" style="line-height: 1.6; font-size: 15px; color: #eee;"></p>
+        
+        <button class="pay" onclick="goPay()">💳 2026년 신년운세 보기 (유료)</button>
     </div>
-  </div>
+</div>
 
-  <!-- ===== 로그인 모달 ===== -->
-  <div class="overlay" id="loginOverlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="로그인">
-      <div class="modalHead">
-        <b>👤 로그인</b>
-        <button class="xbtn" type="button" data-close="login">✕</button>
-      </div>
-      <div class="modalBody">
-        <div class="muted">데모 로그인입니다. 이메일/비번 아무거나 입력해도 “로그인됨” 처리됩니다.</div>
+<div class="footer">
+    © 2026 Sajuking AI | Precision Manseryeok Engine
+</div>
 
-        <div class="field">
-          <label for="loginEmail">이메일</label>
-          <input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email">
-        </div>
-        <div class="field">
-          <label for="loginPass">비밀번호</label>
-          <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
-        </div>
+<script>
+// 오행 색상 데이터
+const colors = {
+    '甲': 'wood', '乙': 'wood', '寅': 'wood', '卯': 'wood',
+    '丙': 'fire', '丁': 'fire', '巳': 'fire', '午': 'fire',
+    '戊': 'earth', '己': 'earth', '辰': 'earth', '戌': 'earth', '丑': 'earth', '未': 'earth',
+    '庚': 'metal', '辛': 'metal', '申': 'metal', '酉': 'metal',
+    '壬': 'water', '癸': 'water', '亥': 'water', '子': 'water'
+};
 
-        <div class="danger" id="loginErr">이메일과 비밀번호를 입력해 주세요.</div>
+function analyze() {
+    const name = document.getElementById("name").value;
+    const birth = document.getElementById("birth").value;
+    const time = document.getElementById("time").value || "00";
 
-        <div class="row" style="margin-top:12px;">
-          <button class="btn ghost" type="button" id="btnGuest">게스트로</button>
-          <button class="btn primary" type="button" id="btnLoginDo">로그인</button>
-        </div>
+    if(!name || birth.length !== 8) {
+        alert("이름과 생년월일 8자리를 정확히 입력해주세요.");
+        return;
+    }
 
-        <div class="hr"></div>
+    // 1. 날짜 파싱
+    const year = birth.substring(0,4);
+    const month = birth.substring(4,6);
+    const day = birth.substring(6,8);
+    const date = new Date(`${year}-${month}-${day}T${time}:00:00`);
 
-        <div class="muted">
-          실제 서비스에서는 Firebase/Supabase/NextAuth 같은 인증을 붙이면 됩니다.
-        </div>
-      </div>
-    </div>
-  </div>
+    // 2. 만세력 계산 (lunar-javascript 라이브러리)
+    const lunar = Lunar.fromDate(date);
+    const eightChar = lunar.getEightChar();
+    
+    const pillars = [
+        { label: '시주', gan: eightChar.getTimeGan(), zhi: eightChar.getTimeZhi() },
+        { label: '일주', gan: eightChar.getDayGan(), zhi: eightChar.getDayZhi() },
+        { label: '월주', gan: eightChar.getMonthGan(), zhi: eightChar.getMonthZhi() },
+        { label: '연주', gan: eightChar.getYearGan(), zhi: eightChar.getYearZhi() }
+    ];
 
-  <!-- ===== 결제 모달 ===== -->
-  <div class="overlay" id="payOverlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="결제">
-      <div class="modalHead">
-        <b>💳 결제 (데모)</b>
-        <button class="xbtn" type="button" data-close="pay">✕</button>
-      </div>
-      <div class="modalBody">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-          <div>
-            <div style="font-weight:1000; letter-spacing:-.2px;">사주 1회 해설</div>
-            <div class="muted">결제 후 “사주 보기”가 열립니다.</div>
-          </div>
-          <div class="badge">₩ 990</div>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="field">
-          <label for="payMethod">결제수단</label>
-          <select id="payMethod">
-            <option value="kakaopay">카카오페이(데모)</option>
-            <option value="tosspay">토스페이(데모)</option>
-            <option value="card">카드(데모)</option>
-          </select>
-        </div>
-
-        <div id="cardFields" style="display:none;">
-          <div class="field">
-            <label for="cardNo">카드번호</label>
-            <input id="cardNo" inputmode="numeric" placeholder="1234 5678 9012 3456">
-          </div>
-          <div class="row">
-            <div class="field">
-              <label for="cardExp">만료</label>
-              <input id="cardExp" placeholder="MM/YY">
+    // 3. 만세력 화면 그리기
+    const manseryeokDiv = document.getElementById("manseryeok");
+    manseryeokDiv.innerHTML = "";
+    
+    pillars.forEach(p => {
+        const ganColor = colors[p.gan];
+        const zhiColor = colors[p.zhi];
+        manseryeokDiv.innerHTML += `
+            <div class="pillar">
+                <div class="pillar-label">${p.label}</div>
+                <span class="gan ${ganColor}">${p.gan}</span>
+                <span class="zhi ${zhiColor}">${p.zhi}</span>
             </div>
-            <div class="field">
-              <label for="cardCvc">CVC</label>
-              <input id="cardCvc" inputmode="numeric" placeholder="123">
-            </div>
-          </div>
-        </div>
-
-        <div class="danger" id="payErr">로그인 후 결제를 진행해 주세요.</div>
-
-        <button class="btn primary fullBtn" type="button" id="btnPayDo" style="margin-top:12px;">
-          결제하기 (₩990)
-        </button>
-
-        <div class="muted" style="margin-top:10px;">
-          * 실제 결제는 PG(토스페이먼츠/나이스/카카오페이/Stripe) 연동이 필요해요.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ===== state (데모) =====
-    const state = {
-      loggedIn: false,
-      userName: "",
-      paid: false
-    };
-
-    // ===== helpers =====
-    const $ = (id) => document.getElementById(id);
-    const loginOverlay = $("loginOverlay");
-    const payOverlay = $("payOverlay");
-
-    function openModal(which){
-      const el = which === "login" ? loginOverlay : payOverlay;
-      el.style.display = "flex";
-      el.setAttribute("aria-hidden", "false");
-    }
-    function closeModal(which){
-      const el = which === "login" ? loginOverlay : payOverlay;
-      el.style.display = "none";
-      el.setAttribute("aria-hidden", "true");
-    }
-    function refreshUI(){
-      const pill = $("statePill");
-      const paidBanner = $("paidBanner");
-      const headline = $("headline");
-
-      if(!state.loggedIn){
-        pill.textContent = "미로그인";
-      } else if(state.loggedIn && !state.paid){
-        pill.textContent = `로그인됨`;
-      } else {
-        pill.textContent = `결제됨`;
-      }
-
-      paidBanner.style.display = state.paid ? "block" : "none";
-
-      // 탭 헤드라인은 버튼/탭에서 바뀜 (별도)
-      // 여기서는 상태에 따라 살짝만 분위기
-      if(state.paid) headline.textContent = "결제 완료! 이제 사주를 열어볼까요? 🔮";
-    }
-
-    // ===== top buttons =====
-    $("btnLoginTop").addEventListener("click", () => openModal("login"));
-    $("btnPayTop").addEventListener("click", () => openModal("pay"));
-
-    // ===== CTA buttons =====
-    $("btnLogin").addEventListener("click", () => openModal("login"));
-    $("btnPay").addEventListener("click", () => openModal("pay"));
-
-    // ===== modal close =====
-    document.querySelectorAll("[data-close]").forEach(btn => {
-      btn.addEventListener("click", (e) => closeModal(e.target.dataset.close));
-    });
-    [loginOverlay, payOverlay].forEach(ov => {
-      ov.addEventListener("click", (e) => {
-        if(e.target === ov){
-          ov === loginOverlay ? closeModal("login") : closeModal("pay");
-        }
-      });
+        `;
     });
 
-    // ===== login logic (demo) =====
-    const loginErr = $("loginErr");
-    $("btnGuest").addEventListener("click", () => {
-      state.loggedIn = true;
-      state.userName = "게스트";
-      loginErr.style.display = "none";
-      closeModal("login");
-      refreshUI();
-    });
-    $("btnLoginDo").addEventListener("click", () => {
-      const email = $("loginEmail").value.trim();
-      const pass = $("loginPass").value.trim();
-      if(!email || !pass){
-        loginErr.style.display = "block";
-        return;
-      }
-      state.loggedIn = true;
-      state.userName = email.split("@")[0] || "회원";
-      loginErr.style.display = "none";
-      closeModal("login");
-      refreshUI();
-    });
+    // 4. 랜덤 텍스트 결과 (실제로는 여기서 일간(Day Gan)에 따른 분석 로직 추가 가능)
+    const texts = [
+        "올해는 재물운이 강하게 들어오는 해입니다. 특히 6~9월 사이 큰 기회가 있습니다.",
+        "인간관계에서 귀인을 만나는 사주입니다. 협업이 돈이 됩니다.",
+        "지금 하는 선택이 3년 후 인생 방향을 바꿉니다. 이동수가 강합니다.",
+        "돈보다 명예운이 먼저 들어오고, 그 뒤 재물이 따라옵니다.",
+        "일간의 기운이 강하여 스스로 개척하는 힘이 좋습니다. 추진력을 발휘하세요."
+    ];
+    const random = texts[Math.floor(Math.random()*texts.length)];
 
-    // ===== payment logic (demo) =====
-    const payErr = $("payErr");
-    const payMethod = $("payMethod");
-    const cardFields = $("cardFields");
+    document.getElementById("resultTitle").innerText = `📜 ${name}님의 사주 분석`;
+    document.getElementById("text").innerText = random;
+    document.getElementById("result").style.display="block";
+}
 
-    payMethod.addEventListener("change", () => {
-      cardFields.style.display = (payMethod.value === "card") ? "block" : "none";
-    });
+function goPay() {
+    alert("🚀 프리미엄 결제 페이지로 이동합니다. (Stripe/Toss)");
+}
+</script>
 
-    $("btnPayDo").addEventListener("click", () => {
-      if(!state.loggedIn){
-        payErr.style.display = "block";
-        return;
-      }
-      payErr.style.display = "none";
-
-      // 데모 결제 완료 처리
-      state.paid = true;
-      closeModal("pay");
-      refreshUI();
-      alert("결제 완료(데모)!");
-    });
-
-    // ===== open saju =====
-    $("btnSajuOpen").addEventListener("click", () => {
-      if(!state.loggedIn){
-        alert("먼저 로그인해 주세요!");
-        openModal("login");
-        return;
-      }
-      if(!state.paid){
-        alert("사주 1회 해설은 결제 후 열립니다. (데모)");
-        openModal("pay");
-        return;
-      }
-      alert("사주 보기 페이지(다음 화면)로 이동! (데모)");
-    });
-
-    // ===== bottom nav demo =====
-    const navItems = [...document.querySelectorAll(".navItem")];
-    const headline = $("headline");
-    function setActive(tab){
-      navItems.forEach(n => n.classList.toggle("active", n.dataset.tab === tab));
-      if(tab === "saju") headline.textContent = "사주 해설은 왜 늘 불안하고 비쌀까?";
-      if(tab === "love") headline.textContent = "궁합, 말 못한 고민까지 시원하게!";
-      if(tab === "today") headline.textContent = "오늘 운세, 한 줄로 딱 정리해드림";
-      $("screen").scrollTo({ top: 0, behavior: "smooth" });
-    }
-    navItems.forEach(n => n.addEventListener("click", () => setActive(n.dataset.tab)));
-
-    // init
-    refreshUI();
-  </script>
 </body>
 </html>

@@ -1,213 +1,2432 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>사주왕 - AI 사주 분석 & 만세력</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
-<style>
-    body {
-        margin:0;
-        font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-        background: linear-gradient(135deg,#0f0c29,#302b63,#24243e);
-        color:white;
-        min-height: 100vh;
-    }
-    header {
-        padding:40px 20px 20px;
-        text-align:center;
-        font-size:32px;
-        font-weight:bold;
-        letter-spacing: -1px;
-    }
-    .container {
-        max-width:500px;
-        margin:0 auto 40px;
-        background: rgba(255,255,255,0.08);
-        padding:30px;
-        border-radius:24px;
-        box-shadow:0 10px 30px rgba(0,0,0,0.5);
-        backdrop-filter: blur(10px);
-    }
-    h2 { font-size: 20px; text-align: center; margin-bottom: 25px; color: #ccc; }
-    input, button, select {
-        width: 100%;
-        padding: 14px;
-        margin: 8px 0;
-        border: none;
-        border-radius: 12px;
-        font-size: 16px;
-        box-sizing: border-box;
-    }
-    input { background: rgba(255,255,255,0.9); color: #333; }
-    button {
-        background: linear-gradient(to right, #ffcc00, #ffb300);
-        color: black;
-        font-weight: bold;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-    button:active { transform: scale(0.98); }
-    
-    /* 만세력 테이블 스타일 */
-    .manseryeok-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        margin: 20px 0;
-        text-align: center;
-    }
-    .pillar {
-        background: rgba(255,255,255,0.1);
-        padding: 10px 5px;
-        border-radius: 8px;
-    }
-    .pillar-label { font-size: 11px; color: #aaa; margin-bottom: 5px; }
-    .gan, .zhi { font-size: 20px; font-weight: bold; display: block; margin: 2px 0; }
-    .hangul { font-size: 12px; opacity: 0.7; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>별하(Byeolha) 프로젝트 개요</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #a78bfa;
+            --primary-pink: #f472b6;
+            --bg-cream: #fdfbf7;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+        }
 
-    /* 오행 색상 */
-    .wood { color: #4ade80; }  /* 목 */
-    .fire { color: #fb7185; }  /* 화 */
-    .earth { color: #fbbf24; } /* 토 */
-    .metal { color: #e5e7eb; } /* 금 */
-    .water { color: #60a5fa; } /* 수 */
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
 
-    .result {
-        margin-top:20px;
-        background: rgba(0,0,0,0.4);
-        padding:20px;
-        border-radius:15px;
-        display:none;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-    .pay {
-        margin-top:20px;
-        background:#00e0ff;
-        color:black;
-        font-weight:bold;
-    }
-    .footer {
-        text-align:center;
-        opacity:0.4;
-        padding-bottom: 40px;
-        font-size:12px;
-    }
-</style>
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* 글라스모피즘 카드 스타일 */
+        section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            color: #444;
+            border-bottom: 2px solid var(--primary-purple);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 i {
+            margin-right: 10px;
+            color: var(--primary-purple);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: rgba(167, 139, 250, 0.1);
+            color: #555;
+            width: 30%;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        .flow-chart {
+            background: #f0ebff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #5b21b6;
+        }
+
+        .warning {
+            background-color: #fff5f5;
+            border-left: 4px solid #f87171;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary-purple);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+    </style>
 </head>
 <body>
 
-<header>🔮 사주왕 AI</header>
-
 <div class="container">
-    <h2>운명의 흐름을 분석합니다</h2>
-    <input id="name" placeholder="이름 입력">
-    <input type="text" id="birth" placeholder="생년월일 8자리 (19900101)">
-    <select id="time">
-        <option value="">태어난 시간 선택 (모름)</option>
-        <option value="00">자시 (23:30~01:29)</option>
-        <option value="02">축시 (01:30~03:29)</option>
-        <option value="04">인시 (03:30~05:29)</option>
-        <option value="06">묘시 (05:30~07:29)</option>
-        <option value="08">진시 (07:30~09:29)</option>
-        <option value="10">사시 (09:30~11:29)</option>
-        <option value="12">오시 (11:30~13:29)</option>
-        <option value="14">미시 (13:30~15:29)</option>
-        <option value="16">신시 (15:30~17:29)</option>
-        <option value="18">유시 (17:30~19:29)</option>
-        <option value="20">술시 (19:30~21:29)</option>
-        <option value="22">해시 (21:30~23:29)</option>
-    </select>
-    <button onclick="analyze()">실시간 AI 사주 분석</button>
+    <header>
+        <h1>사주왕 (Byeolha)</h1>
+        <p class="subtitle">"당신의 운명을 비추다" - 프로젝트 개요</p>
+    </header>
 
-    <div class="result" id="result">
-        <h3 id="resultTitle">📜 분석 결과</h3>
-        
-        <div class="manseryeok-grid" id="manseryeok">
-            </div>
+    <section>
+        <h2><i class="fa-solid fa-circle-info"></i> 프로젝트 정보</h2>
+        <table>
+            <tr>
+                <th>프로젝트명</th>
+                <td>별하 (Byeolha)</td>
+            </tr>
+            <tr>
+                <th>기술 스택</th>
+                <td>Python Flask, OpenAI GPT-4o, HTML/CSS/JS</td>
+            </tr>
+            <tr>
+                <th>주요 기능</th>
+                <td>AI 기반 심층 사주 분석 웹 서비스</td>
+            </tr>
+            <tr>
+                <th>분석 범위</th>
+                <td>사주 원국, 오행/십성, 근묘화실, 대운 8주기</td>
+            </tr>
+        </table>
+    </section>
 
-        <p id="text" style="line-height: 1.6; font-size: 15px; color: #eee;"></p>
-        
-        <button class="pay" onclick="goPay()">💳 2026년 신년운세 보기 (유료)</button>
-    </div>
+    <section>
+        <h2><i class="fa-solid fa-sitemap"></i> 프로젝트 구조</h2>
+        <pre>
+프로젝트_폴더/
+├── .env                    # 환경변수 (OpenAI API 키)
+├── app.py                  # Flask 메인 애플리케이션
+├── ai_analysis.py          # OpenAI GPT-4o 연동 모듈
+├── saju_logic.py           # 사주 계산 핵심 로직
+├── requirements.txt        # Python 패키지 의존성
+├── static/
+│   └── style.css          # 글로벌 스타일
+└── templates/
+    ├── index.html         # 입력 폼 페이지
+    ├── loading.html       # 로딩 애니메이션
+    └── result.html        # 결과 표시 페이지</pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-arrows-rotate"></i> 사용자 플로우</h2>
+        <div class="flow-chart">
+            입력 폼 (index.html) <br>
+            ↓ <br>
+            로딩 애니메이션 (loading.html) <br>
+            ↓ <br>
+            결과 분석 완료 (result.html)
+        </div>
+        <ul style="margin-top: 20px;">
+            <li><strong>입력</strong>: 이름, 성별, 생년월일, 태어난 시간 수집</li>
+            <li><strong>대기</strong>: 신비로운 애니메이션과 함께 GPT-4o 분석 진행</li>
+            <li><strong>결과</strong>: 사주 원국표 및 4개 탭(기본, 오행, 흐름, 대운) 제공</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-terminal"></i> 실행 방법</h2>
+        <ol>
+            <li><strong>패키지 설치</strong>
+                <pre>pip install -r requirements.txt</pre>
+            </li>
+            <li><strong>API 키 설정</strong>
+                <div class="warning">⚠️ 반드시 본인의 OpenAI API 키를 .env 파일에 설정해야 합니다.</div>
+                <pre>OPENAI_API_KEY=sk-your-key</pre>
+            </li>
+            <li><strong>서버 실행</strong>
+                <pre>python app.py</pre>
+            </li>
+        </ol>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-palette"></i> 디자인 컨셉</h2>
+        <ul>
+            <li><strong>Color</strong>: <span style="color:#a78bfa">● 파스텔 보라</span>, <span style="color:#f472b6">● 핑크</span>, <span style="color:#888">● 크림 배경</span></li>
+            <li><strong>Style</strong>: 글라스모피즘, 부드러운 그라데이션 애니메이션</li>
+            <li><strong>Font</strong>: Pretendard</li>
+        </ul>
+    </section>
 </div>
 
-<div class="footer">
-    © 2026 Sajuking AI | Precision Manseryeok Engine
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사주 로직 명세서 (saju_logic.py)</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #a78bfa;
+            --primary-pink: #f472b6;
+            --bg-cream: #fdfbf7;
+            --code-bg: #1e1e1e;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: #333;
+            line-height: 1.7;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+        }
+
+        section {
+            background: var(--glass-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #444;
+            border-left: 5px solid var(--primary-purple);
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 25px;
+        }
+
+        h4 {
+            color: var(--primary-purple);
+            margin-bottom: 10px;
+        }
+
+        /* 코드 스타일 */
+        pre {
+            background: var(--code-bg);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: inherit;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: rgba(167, 139, 250, 0.1);
+            color: #555;
+        }
+
+        .method-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>사주 로직 명세서 (saju_logic.py)</h1>
+
+    <section>
+        <h2>📌 개요</h2>
+        <p><code>SajuLogic</code> 클래스는 사주팔자 계산의 핵심 로직을 담당합니다. 총 705줄로 구성되며, 다음 기능을 제공합니다:</p>
+        <ul>
+            <li>사주 원국 계산 (년/월/일/시주)</li>
+            <li>오행 분포 계산</li>
+            <li>십성(십신) 판정</li>
+            <li>대운 계산 (8주기, 80년)</li>
+            <li>근묘화실(생애주기) 분석</li>
+            <li>오늘의 운세</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>🔧 기본 데이터 구조</h2>
+        
+        <h3>천간 (天干, Heavenly Stems)</h3>
+<pre><code>CHEONGAN = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계']
+<span class="comment"># 인덱스:   0     1     2     3     4     5     6     7     8     9</span></code></pre>
+
+        <h3>지지 (地支, Earthly Branches)</h3>
+<pre><code>JIJI = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해']
+<span class="comment"># 인덱스: 0     1     2     3     4     5     6     7     8     9    10    11</span></code></pre>
+
+        <h3>오행 매핑</h3>
+        <h4>천간 오행 (STEM_OHAENG)</h4>
+<pre><code>['wood', 'wood', 'fire', 'fire', 'earth', 'earth', 'metal', 'metal', 'water', 'water']
+<span class="comment"># 갑을=목, 병정=화, 무기=토, 경신=금, 임계=수</span></code></pre>
+
+        <h4>지지 오행 (BRANCH_OHAENG)</h4>
+<pre><code>['water', 'earth', 'wood', 'wood', 'earth', 'fire', 'fire', 'earth', 'metal', 'metal', 'earth', 'water']
+<span class="comment"># 자=수, 축=토, 인묘=목, 진=토, 사오=화, 미=토, 신유=금, 술=토, 해=수</span></code></pre>
+    </section>
+
+    <section>
+        <h2>🧮 핵심 알고리즘</h2>
+
+        <h3>1. 사주 원국 계산 <code>get_gan_zhi(year, month, day, hour, minute)</code></h3>
+        
+        <h4>년주 (Year Pillar)</h4>
+<pre><code><span class="comment"># 입춘 기준 (2월 4일) 적용</span>
+is_before_lichun = (month < 2) or (month == 2 and day < 4)
+calc_year = year - 1 <span class="keyword">if</span> is_before_lichun <span class="keyword">else</span> year
+
+<span class="comment"># 60갑자 순환 계산</span>
+year_idx = (calc_year - 4) % 60
+year_stem_idx = year_idx % 10   <span class="comment"># 천간 인덱스</span>
+year_branch_idx = year_idx % 12  <span class="comment"># 지지 인덱스</span></code></pre>
+
+        <h4>월주 (Month Pillar)</h4>
+<pre><code><span class="comment"># 년간에 따른 월간 시작점 (年上起月法)</span>
+month_start_stems = [2, 4, 6, 8, 0]  <span class="comment"># 갑기=병, 을경=무, 병신=경, 정임=임, 무계=갑</span>
+start_stem = month_start_stems[year_stem_idx % 5]
+
+<span class="comment"># 절기 기준 간소화 (매월 5일 이전은 전월)</span>
+target_month = month
+<span class="keyword">if</span> day < 5:
+    target_month = month - 1 <span class="keyword">if</span> month > 1 <span class="keyword">else</span> 12
+
+month_branch_idx = target_month % 12
+month_idx_from_feb = target_month - 2
+<span class="keyword">if</span> month_idx_from_feb < 0: month_idx_from_feb += 12
+month_stem_idx = (start_stem + month_idx_from_feb) % 10</code></pre>
+
+        <h4>일주 (Day Pillar)</h4>
+<pre><code><span class="comment"># 기준일: 2000년 1월 1일 = 무오(戊午) = 60갑자 54번째</span>
+ref_2000 = datetime(2000, 1, 1)
+delta_days = (curr_date - ref_2000).days
+day_cycle_idx = (54 + delta_days) % 60
+day_stem_idx = day_cycle_idx % 10
+day_branch_idx = day_cycle_idx % 12</code></pre>
+
+        <h4>시주 (Hour Pillar)</h4>
+<pre><code><span class="comment"># 시지 계산 (2시간 단위, 자시=23:00~01:00)</span>
+hour_branch_idx = (hour + 1) // 2 % 12
+
+<span class="comment"># 일간에 따른 시간 시작점 (日上起時法)</span>
+hour_start_stems = [0, 2, 4, 6, 8]  <span class="comment"># 갑기=갑, 을경=병, 병신=무, 정임=경, 무계=임</span>
+hour_start_stem = hour_start_stems[day_stem_idx % 5]
+hour_stem_idx = (hour_start_stem + hour_branch_idx) % 10</code></pre>
+
+        <h4>반환 구조</h4>
+<pre><code>{
+    'year': {'gan': '갑', 'zhi': '자', 'gan_idx': 0, 'zhi_idx': 0, 'gan_element': 'wood', 'zhi_element': 'water'},
+    'month': {...},
+    'day': {...},
+    'hour': {...}
+}</code></pre>
+
+        <hr>
+
+        <h3>2. 오행 분포 계산 <code>get_ohaeng_distribution(pillars)</code></h3>
+<pre><code>dist = {'wood': 0, 'fire': 0, 'earth': 0, 'metal': 0, 'water': 0}
+<span class="keyword">for</span> key <span class="keyword">in</span> ['year', 'month', 'day', 'hour']:
+    dist[STEM_OHAENG[pillars[key]['gan_idx']]] += 1  <span class="comment"># 천간</span>
+    dist[BRANCH_OHAENG[pillars[key]['zhi_idx']]] += 1  <span class="comment"># 지지</span>
+<span class="comment"># 총 8개 (천간4 + 지지4)</span></code></pre>
+
+        <hr>
+
+        <h3>3. 십성(십신) 판정 <code>_determine_god(me_idx, target_idx, me_pol, target_pol)</code></h3>
+        <h4>오행 관계 계산</h4>
+<pre><code>diff = (target_idx - me_idx) % 5
+<span class="comment"># 0: 비견/겁재 (같은 오행)
+# 1: 식신/상관 (내가 생함)
+# 2: 편재/정재 (내가 극함)
+# 3: 편관/정관 (나를 극함)
+# 4: 편인/정인 (나를 생함)</span></code></pre>
+
+        <h4>음양 판정</h4>
+<pre><code>is_same_polarity = (me_pol == target_pol)
+<span class="comment"># 같은 음양 → 비견, 식신, 편재, 편관, 편인
+# 다른 음양 → 겁재, 상관, 정재, 정관, 정인</span></code></pre>
+
+        <h4>지지 음양 보정 (특수 처리)</h4>
+<pre><code>zhi_polarities = [1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0]
+<span class="comment"># 자(음), 축(음), 인(양), 묘(음), 진(양), 사(양), 오(음), 미(음), 신(양), 유(음), 술(양), 해(양)</span></code></pre>
+    </section>
+
+    <section>
+        <h2>4. 대운 계산</h2>
+        <h4>대운 방향 및 시작 나이 <code>get_daewoon(year_gan_idx, gender, day)</code></h4>
+<pre><code>is_yang_year = (year_gan_idx % 2 == 0)
+is_male = (gender == 'male')
+is_forward = (is_yang_year <span class="keyword">and</span> is_male) <span class="keyword">or</span> (<span class="keyword">not</span> is_yang_year <span class="keyword">and</span> <span class="keyword">not</span> is_male)
+<span class="comment"># 양남음녀 = 순행, 음남양녀 = 역행</span>
+
+daewoon_num = (day % 10) <span class="keyword">if</span> (day % 10) != 0 <span class="keyword">else</span> 10  <span class="comment"># 대운 시작 나이</span></code></pre>
+
+        <h4>대운 리스트 생성 <code>calculate_daewoon_list(...)</code></h4>
+<pre><code><span class="keyword">for</span> i <span class="keyword">in</span> range(8):  <span class="comment"># 8주기 = 80년</span>
+    current_gan = (month_gan_idx + step * (i+1)) % 10
+    current_zhi = (month_zhi_idx + step * (i+1)) % 12
+    start_age = daewoon_num + (i * 10)
+    advice = _get_daewoon_advice(day_master_gan_idx, current_gan)</code></pre>
+
+        <h4>대운 조언 텍스트 <code>_get_daewoon_advice(day_master_gan_idx, daewoon_gan_idx)</code></h4>
+        <p>십성별 상세 조언 (각 100자 이상):</p>
+        <ul>
+            <li><strong>비견</strong>: 동료/경쟁자, 협업 시너지</li>
+            <li><strong>겁재</strong>: 경쟁 심리, 재물 다툼</li>
+            <li><strong>식신</strong>: 재능 발휘, 창의력</li>
+            <li><strong>상관</strong>: 변화 추구, 언변</li>
+            <li><strong>편재</strong>: 사업 수완, 투자</li>
+            <li><strong>정재</strong>: 안정적 수입, 저축</li>
+            <li><strong>편관</strong>: 책임감, 리더십</li>
+            <li><strong>정관</strong>: 명예, 승진</li>
+            <li><strong>편인</strong>: 철학, 특수 기술</li>
+            <li><strong>정인</strong>: 학문, 문서운</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>5. 근묘화실 (생애주기) <code>get_geun_myo_hwa_sil(pillars)</code></h2>
+<pre><code>{
+    'year': {'period': '초년기 (0~19세)', 'desc': '...', 'pillar': pillars['year']},
+    'month': {'period': '청년기 (20~39세)', 'desc': '...', 'pillar': pillars['month']},
+    'day': {'period': '중년기 (40~59세)', 'desc': '...', 'pillar': pillars['day']},
+    'hour': {'period': '말년기 (60세~)', 'desc': '...', 'pillar': pillars['hour']}
+}</code></pre>
+
+        <h2>6. 오늘의 운세 <code>get_today_fortune(day_master_element, gender)</code></h2>
+<pre><code><span class="comment"># 오늘의 일간과 본인 일간의 오행 관계 계산</span>
+diff = (today_idx - me_idx) % 5
+
+fortunes = {
+    0: {"title": "🤝 어깨를 나란히 하는 날", "desc": "..."},
+    1: {"title": "🎨 재능이 꽃피는 날", "desc": "..."},
+    2: {"title": "💰 결실을 맺는 날", "desc": "..."},
+    3: {"title": "👑 명예가 드높은 날", "desc": "..."},
+    4: {"title": "📚 귀인의 도움이 있는 날", "desc": "..."}
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>7. 일간별 핵심 성향 <code>_get_core_trait(master, element)</code></h2>
+        <p>10천간 각각에 대해 상세한 성격 분석 (각 150자 이상):</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>일간</th>
+                    <th>상징</th>
+                    <th>키워드</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>갑</td><td>🌲 곧게 뻗은 소나무</td><td>리더십, 추진력, 자존심</td></tr>
+                <tr><td>을</td><td>🌿 강인한 생명력의 꽃</td><td>적응력, 유연함, 실속</td></tr>
+                <tr><td>병</td><td>☀️ 세상을 비추는 태양</td><td>열정, 솔직, 화려함</td></tr>
+                <tr><td>정</td><td>🕯️ 은근하게 타오르는 촛불</td><td>따뜻함, 섬세함, 헌신</td></tr>
+                <tr><td>무</td><td>⛰️ 묵직한 태산</td><td>믿음직함, 포용력, 신중</td></tr>
+                <tr><td>기</td><td>🌱 비옥한 텃밭</td><td>실속, 현실감각, 수용력</td></tr>
+                <tr><td>경</td><td>🪨 단단한 원석</td><td>의리, 결단력, 신념</td></tr>
+                <tr><td>신</td><td>💎 반짝이는 보석</td><td>섬세함, 미적감각, 자존심</td></tr>
+                <tr><td>임</td><td>🌊 드넓은 바다</td><td>지혜, 유연함, 창의력</td></tr>
+                <tr><td>계</td><td>🌧️ 촉촉한 단비</td><td>섬세함, 친화력, 지혜</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>📊 interpret() 메인 함수 반환 구조</h2>
+<pre><code>{
+    'core': '핵심 성향 텍스트',
+    'advice': '오행 기반 조언',
+    'wealth': '재물운',
+    'love': '애정운',
+    'career': '직업 적성',
+    'today_luck': {'date': '...', 'pillar': '...', 'title': '...', 'desc': '...'},
+    'gmhs': {'year': {...}, 'month': {...}, 'day': {...}, 'hour': {...}},
+    'ohaeng_analysis': {'percentages': {...}, 'details': [...], 'balance_text': '...'},
+    'daewoon': [{'age': 5, 'gan': '갑', 'zhi': '자', 'text': '...'}, ...],  <span class="comment"># 8개</span>
+    'ten_gods': {'year': {'gan': '비견', 'zhi': '정재'}, ...}
+}</code></pre>
+    </section>
 </div>
 
 <script>
-// 오행 색상 데이터
-const colors = {
-    '甲': 'wood', '乙': 'wood', '寅': 'wood', '卯': 'wood',
-    '丙': 'fire', '丁': 'fire', '巳': 'fire', '午': 'fire',
-    '戊': 'earth', '己': 'earth', '辰': 'earth', '戌': 'earth', '丑': 'earth', '未': 'earth',
-    '庚': 'metal', '辛': 'metal', '申': 'metal', '酉': 'metal',
-    '壬': 'water', '癸': 'water', '亥': 'water', '子': 'water'
-};
+    // 이미지 태그 삽입 예시 (시각적 이해를 돕기 위함)
+    // </script>
 
-function analyze() {
-    const name = document.getElementById("name").value;
-    const birth = document.getElementById("birth").value;
-    const time = document.getElementById("time").value || "00";
+</body>
+</html>
 
-    if(!name || birth.length !== 8) {
-        alert("이름과 생년월일 8자리를 정확히 입력해주세요.");
-        return;
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 분석 모듈 명세서 (ai_analysis.py)</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #a78bfa;
+            --primary-pink: #f472b6;
+            --bg-cream: #fdfbf7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --code-bg: #2d2d2d;
+            --text-main: #333;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--text-main);
+            line-height: 1.7;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #444;
+            border-left: 6px solid var(--primary-purple);
+            padding-left: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2 i { margin-right: 12px; font-size: 1.3rem; color: var(--primary-purple); }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        /* 표 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: rgba(167, 139, 250, 0.1);
+            color: #555;
+            font-weight: 600;
+        }
+
+        /* 코드 블록 스타일 */
+        pre {
+            background: var(--code-bg);
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .prompt-container {
+            background: #f0f4ff;
+            border-left: 5px solid #5c7cfa;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            font-style: normal;
+            white-space: pre-wrap;
+            font-family: 'Pretendard', sans-serif;
+            color: #2c3e50;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .tag-role { background: #e7f5ff; color: #1c7ed6; }
+        .tag-input { background: #fff4e6; color: #d9480f; }
+
+        hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>AI 분석 모듈 명세서 (ai_analysis.py)</h1>
+    </header>
+
+    <section>
+        <h2><i class="fa-solid fa-circle-info"></i> 📌 개요</h2>
+        <p><code>AIAnalysis</code> 클래스는 OpenAI GPT-4o를 활용한 심층 사주 분석을 담당합니다. 기본 사주 로직의 결과를 받아 풍부한 서술형 해석을 생성합니다.</p>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-gears"></i> 🔧 클래스 구조</h2>
+<pre><code>from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class AIAnalysis:
+    def __init__(self):
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        if self.api_key:
+            self.client = OpenAI(api_key=self.api_key)
+        else:
+            self.client = None</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-right-to-bracket"></i> 📥 입력 파라미터</h2>
+        <p><code>get_deep_analysis(name, gender, pillars, ohaeng, ten_stars_list, current_daewun, birth_context)</code></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>파라미터</th>
+                    <th>타입</th>
+                    <th>예시</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>name</td><td>str</td><td>"홍길동"</td></tr>
+                <tr><td>gender</td><td>str</td><td>"male" 또는 "female"</td></tr>
+                <tr><td>pillars</td><td>dict</td><td>사주 원국 데이터</td></tr>
+                <tr><td>ohaeng</td><td>dict</td><td><code>{'percentages': {'wood': 25.0, ...}}</code></td></tr>
+                <tr><td>ten_stars_list</td><td>str</td><td>"비견 2, 식신 1, 정재 3"</td></tr>
+                <tr><td>current_daewun</td><td>str</td><td>"5세 대운 (을축)"</td></tr>
+                <tr><td>birth_context</td><td>str</td><td>"1990년생 (36세)"</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-comment-dots"></i> 🎯 GPT 프롬프트 전문</h2>
+        <div class="prompt-container">
+<span class="tag tag-role"># Role: 2030 맞춤형 라이프 전략가 & 현대 명리학 마스터</span>
+당신은 사용자의 '{birth_context}'라는 생애 주기적 배경을 깊이 고려하여 조언하는 전문 분석가입니다.
+
+<span class="tag tag-input"># Input Data</span>
+- 이름: {name}, 성별: {gender}, 나이/생년: {birth_context}
+- 본원(일간): {day_stem}
+- 사주 원국: 연:[{년간}{년지}] 월:[{월간}{월지}] 일:[{일간}{일지}] 시:[{시간}{시지}]
+- 십신 구성: {ten_stars_list}
+- 오행 점수: {ohaeng_str}
+- 현재 대운: {current_daewun}
+
+<span class="tag tag-input"># Analysis Roadmap & Output JSON Structure</span>
+모든 답변은 다음 키를 가진 JSON 형식으로 출력하세요. 각 필드는 **최소 8~12문장 이상의 풍부한 장문**으로 작성하세요.
+
+1. <strong>total_summary</strong>: [평생사주 총평] 삶의 목적, 운의 흐름, 기질과 미래 통찰을 에세이처럼 서술
+2. <strong>gmhs</strong>: [생애주기 분석] 근묘화실 기반
+   - year: 초년기(0~19세) - 부모운, 성장 환경, 성격의 뿌리 (최소 5문장)
+   - month: 청년기(20~39세) - 사회생활, 직업적 도전, 자아실현 (최소 5문장)
+   - day: 중년기(40~59세) - 자산 형성, 인생의 꽃, 가정운 (최소 5문장)
+   - hour: 말년기(60세~) - 결실, 자녀복, 노후의 평온함 (최소 5문장)
+3. <strong>daewoon_trend</strong>: [대운의 흐름] 현재 대운을 중심으로 10년 주기 변화의 의미와 기회
+4. <strong>health_analysis</strong>: [건강 & 체질] 오행 밸런스 기반 신체 특징, 취약 부위, 힐링 제안
+5. <strong>social_analysis</strong>: [사회운 & 적성] 대인관계 스타일, 조직 적응도, 추천 직업
+6. <strong>personality_deep</strong>: [인성 & 성향] 내면의 인품, 숨겨진 재능, 감정 다스리는 법
+7. <strong>love_romance</strong>: [애정 & 인연] 연애 패턴, 배우자 복, 행복한 관계 조언
+8. <strong>wealth_strategy</strong>: [재물 운용 전략] 돈 모으는 법, 투자 성향, 손실 방지 비책
+9. <strong>today_luck</strong>: [오늘의 에너지] 오늘 하루를 위한 강렬하고 따뜻한 격언
+
+<span class="tag tag-role"># Instruction for Quality</span>
+1. [Tone]: 전문 용어를 현대적 심리학 용어와 비유로 풀어내어 공감 극대화
+2. [Volume]: 각 텍스트는 자기계발서나 위로의 편지처럼 풍성하게 작성
+3. [Context]: 사용자 연령을 고려하여 현재 고민할 법한 지점을 정확히 짚어주세요
+        </div>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-code"></i> ⚙️ API 호출 설정</h2>
+<pre><code>response = self.client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "system", 
+            "content": "당신은 현대적 감각을 가진 사주 분석 전문가입니다. 반드시 JSON 형식으로만 답변하며, 값은 항상 문자열이어야 합니다."
+        },
+        {"role": "user", "content": prompt}
+    ],
+    response_format={"type": "json_object"},
+    temperature=0.7,
+    timeout=120  # 120초 타임아웃
+)
+
+return json.loads(response.choices[0].message.content)</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-file-code"></i> 📤 반환 JSON 구조</h2>
+<pre><code>{
+    "total_summary": "당신은 타고난 리더십과 깊은 내면의 지혜를 가진 사람입니다...(8-12문장)",
+    "gmhs": {
+        "year": "초년기의 당신은 활발한 에너지를 가지고...(5문장 이상)",
+        "month": "청년기에는 사회적 도전이 시작되며...(5문장 이상)",
+        "day": "중년기는 당신 인생의 꽃이 피는 시기로...(5문장 이상)",
+        "hour": "말년기에는 지혜로운 어른으로서...(5문장 이상)"
+    },
+    "daewoon_trend": "현재 당신의 대운은...(8-12문장)",
+    "health_analysis": "오행 밸런스를 보면 화 기운이 강하여...(8-12문장)",
+    "social_analysis": "대인관계에서 당신은...(8-12문장)",
+    "personality_deep": "내면의 당신은...(8-12문장)",
+    "love_romance": "연애 패턴을 보면...(8-12문장)",
+    "wealth_strategy": "재물운을 분석하면...(8-12문장)",
+    "today_luck": "오늘은 당신의 에너지가...(3-5문장)"
+}</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-triangle-exclamation"></i> 🔄 Fallback 처리</h2>
+        <p>API 호출 실패 또는 API 키 없음 시:</p>
+<pre><code>if not self.client:
+    return None  # app.py에서 기본 saju_logic 결과 사용</code></pre>
+
+        <hr>
+
+        <h2><i class="fa-solid fa-layer-group"></i> 📊 app.py에서의 AI 데이터 병합</h2>
+<pre><code>if ai_data:
+    # AI 결과로 덮어쓰기
+    interpretations['total_summary'] = ai_data.get('total_summary', "...")
+    interpretations['personality_deep'] = ai_data.get('personality_deep', "...")
+    interpretations['social_analysis'] = ai_data.get('social_analysis', "...")
+    interpretations['health_analysis'] = ai_data.get('health_analysis', "...")
+    interpretations['daewoon_trend'] = ai_data.get('daewoon_trend', "...")
+    interpretations['love_romance'] = ai_data.get('love_romance', interpretations['love'])
+    interpretations['wealth_strategy'] = ai_data.get('wealth_strategy', interpretations['wealth'])
+    
+    # 레거시 키 호환
+    interpretations['core'] = ai_data.get('personality_deep', interpretations['core'])
+    interpretations['advice'] = ai_data.get('health_analysis', interpretations['advice'])
+    
+    # GMHS 심층 분석 병합
+    if 'gmhs' in ai_data:
+        for period in ['year', 'month', 'day', 'hour']:
+            interpretations['gmhs'][period]['desc'] = ai_data['gmhs'][period]
+    
+    # 오늘의 운세 병합
+    if 'today_luck' in ai_data:
+        interpretations['today_luck']['desc'] = str(ai_data['today_luck'])</code></pre>
+    </section>
+</div>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask 앱 명세서 (app.py)</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #a78bfa;
+            --primary-pink: #f472b6;
+            --bg-cream: #fdfbf7;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --code-bg: #1e1e1e;
+            --accent-blue: #60a5fa;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: #333;
+            line-height: 1.7;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #444;
+            border-left: 6px solid var(--primary-purple);
+            padding-left: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2 i { margin-right: 12px; font-size: 1.3rem; color: var(--primary-purple); }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        h3 i { margin-right: 8px; color: var(--accent-blue); }
+
+        /* 표 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: rgba(167, 139, 250, 0.1);
+            color: #555;
+            font-weight: 600;
+        }
+
+        /* 코드 블록 스타일 */
+        pre {
+            background: var(--code-bg);
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .route-path {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-family: monospace;
+            margin-right: 10px;
+        }
+
+        .step-list {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            background: var(--primary-purple);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .badge {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Flask 앱 명세서 (app.py)</h1>
+    </header>
+
+    <section>
+        <h2><i class="fa-solid fa-circle-info"></i> 📌 개요</h2>
+        <p>Flask 웹 애플리케이션의 라우팅, 데이터 처리, 템플릿 렌더링을 담당합니다.</p>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-power-off"></i> 🔧 초기화</h2>
+<pre><code>from flask import Flask, render_template, request
+from saju_logic import SajuLogic
+from ai_analysis import AIAnalysis
+from datetime import datetime
+
+app = Flask(__name__)
+saju = SajuLogic()
+ai = AIAnalysis()</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-route"></i> 🛣️ 라우트 정의</h2>
+
+        <h3><span class="route-path">GET /</span> - 입력 페이지</h3>
+<pre><code>@app.route('/')
+def index():
+    return render_template('index.html')</code></pre>
+
+        <h3><span class="route-path">POST /loading</span> - 로딩 페이지</h3>
+<pre><code>@app.route('/loading', methods=['POST'])
+def loading():
+    return render_template('loading.html', data=request.form)</code></pre>
+        <ul>
+            <li>폼 데이터를 그대로 <code>loading.html</code>에 전달</li>
+            <li>숨겨진 폼으로 300ms 후 자동 제출</li>
+        </ul>
+
+        <h3><span class="route-path">POST /result</span> - 결과 페이지</h3>
+        <p>전체 처리 프로세스:</p>
+<pre><code>@app.route('/result', methods=['POST'])
+def result():
+    # 1. 폼 데이터 파싱
+    name = request.form.get('name')
+    gender = request.form.get('gender')
+    birth_date_str = request.form.get('birth_date')  # "YYYY-MM-DD"
+    birth_time_str = request.form.get('birth_time')  # "HH:MM"
+    
+    # 2. 날짜/시간 분리
+    year, month, day = map(int, birth_date_str.split('-'))
+    hour, minute = map(int, birth_time_str.split(':'))
+    
+    # 3. 사주 계산
+    pillars = saju.get_gan_zhi(year, month, day, hour, minute)
+    ohaeng = saju.get_ohaeng_distribution(pillars)
+    interpretations = saju.interpret(pillars, ohaeng, {'gender': gender})
+    
+    # 4. 나이 계산
+    age = datetime.now().year - year + 1
+    birth_context = f"{year}년생 ({age}세)"
+    
+    # 5. AI용 십성 통계
+    ten_gods_all = []
+    for p_key in interpretations['ten_gods']:
+        ten_gods_all.append(interpretations['ten_gods'][p_key]['gan'])
+        ten_gods_all.append(interpretations['ten_gods'][p_key]['zhi'])
+    
+    from collections import Counter
+    counts = Counter(ten_gods_all)
+    ten_stars_list = ", ".join([f"{k} {v}" for k, v in counts.items()])
+    
+    # 6. 현재 대운 정보
+    current_daewun = f"{interpretations['daewoon'][0]['age']}세 대운 ({interpretations['daewoon'][0]['gan']}{interpretations['daewoon'][0]['zhi']})"
+    
+    # 7. AI 분석 호출
+    ai_data = ai.get_deep_analysis(
+        name, gender, pillars,
+        interpretations['ohaeng_analysis'],
+        ten_stars_list,
+        current_daewun,
+        birth_context
+    )
+    
+    # 8. AI 결과 병합
+    if ai_data:
+        interpretations['total_summary'] = ai_data.get('total_summary', "...")
+        interpretations['personality_deep'] = ai_data.get('personality_deep', "...")
+        interpretations['social_analysis'] = ai_data.get('social_analysis', "...")
+        interpretations['health_analysis'] = ai_data.get('health_analysis', "...")
+        interpretations['daewoon_trend'] = ai_data.get('daewoon_trend', "...")
+        interpretations['love_romance'] = ai_data.get('love_romance', interpretations['love'])
+        interpretations['wealth_strategy'] = ai_data.get('wealth_strategy', interpretations['wealth'])
+        interpretations['core'] = ai_data.get('personality_deep', interpretations['core'])
+        interpretations['advice'] = ai_data.get('health_analysis', interpretations['advice'])
+        
+        # GMHS 병합
+        if 'gmhs' in ai_data:
+            for period in ['year', 'month', 'day', 'hour']:
+                if period in ai_data['gmhs']:
+                    interpretations['gmhs'][period]['desc'] = ai_data['gmhs'][period]
+        
+        # 오늘의 운세 병합
+        if 'today_luck' in ai_data:
+            interpretations['today_luck']['desc'] = str(ai_data['today_luck'])
+    
+    # 9. 렌더링
+    return render_template('result.html',
+        name=name,
+        pillars=pillars,
+        ohaeng=ohaeng,
+        interp=interpretations
+    )</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-table-list"></i> 📊 템플릿 변수</h2>
+
+        <h3>result.html에 전달되는 변수</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>변수명</th>
+                    <th>타입</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>name</code></td><td>str</td><td>사용자 이름</td></tr>
+                <tr><td><code>pillars</code></td><td>dict</td><td>사주 원국 (year/month/day/hour)</td></tr>
+                <tr><td><code>ohaeng</code></td><td>dict</td><td>오행 분포 (wood/fire/earth/metal/water 카운트)</td></tr>
+                <tr><td><code>interp</code></td><td>dict</td><td>해석 데이터 전체</td></tr>
+            </tbody>
+        </table>
+
+        <h3>interp 객체 구조</h3>
+<pre><code>{
+    'core': '핵심 성향',
+    'advice': '맞춤 조언',
+    'wealth': '재물운',
+    'wealth_strategy': 'AI 재물 전략',
+    'love': '애정운',
+    'love_romance': 'AI 애정 분석',
+    'career': '직업 적성',
+    'total_summary': 'AI 총평',
+    'personality_deep': 'AI 성향 분석',
+    'social_analysis': 'AI 사회운',
+    'health_analysis': 'AI 건강 분석',
+    'daewoon_trend': 'AI 대운 흐름',
+    'today_luck': {
+        'date': '2026년 01월 09일',
+        'pillar': '갑자일',
+        'title': '🤝 어깨를 나란히 하는 날',
+        'desc': '...'
+    },
+    'gmhs': {
+        'year': {'period': '초년기 (0~19세)', 'desc': '...', 'pillar': {...}},
+        'month': {...},
+        'day': {...},
+        'hour': {...}
+    },
+    'ohaeng_analysis': {
+        'percentages': {'wood': 25.0, 'fire': 12.5, ...},
+        'details': [...],
+        'balance_text': '오행이 골고루 갖춰진 황금 밸런스입니다!'
+    },
+    'daewoon': [
+        {'age': 5, 'gan': '을', 'zhi': '축', 'gan_element': 'wood', 'zhi_element': 'earth', 'text': '[비견] ...'},
+        # ... 8개
+    ],
+    'ten_gods': {
+        'year': {'gan': '편인', 'zhi': '정재'},
+        'month': {'gan': '비견', 'zhi': '식신'},
+        'day': {'gan': '나', 'zhi': '편관'},
+        'hour': {'gan': '상관', 'zhi': '정인'}
     }
+}</code></pre>
+    </section>
 
-    // 1. 날짜 파싱
-    const year = birth.substring(0,4);
-    const month = birth.substring(4,6);
-    const day = birth.substring(6,8);
-    const date = new Date(`${year}-${month}-${day}T${time}:00:00`);
+    <section>
+        <h2><i class="fa-solid fa-bug"></i> 🔄 에러 처리</h2>
+<pre><code>except Exception as e:
+    import traceback
+    traceback.print_exc()
+    return f"Error occurred: {str(e)}", 400</code></pre>
 
-    // 2. 만세력 계산 (lunar-javascript 라이브러리)
-    const lunar = Lunar.fromDate(date);
-    const eightChar = lunar.getEightChar();
+        <h2><i class="fa-solid fa-play"></i> 🚀 실행</h2>
+<pre><code>if __name__ == '__main__':
+    app.run(debug=True)</code></pre>
+        <ul>
+            <li>기본 포트: 5000</li>
+            <li>디버그 모드: 활성화</li>
+        </ul>
+    </section>
+</div>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프론트엔드 UI 명세서</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* UI 명세서 전용 스타일 */
+        :root {
+            --primary-purple: #a78bfa;
+            --primary-pink: #f472b6;
+            --bg-cream: #fdfbf7;
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: #333;
+            line-height: 1.7;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 50px;
+        }
+
+        section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #444;
+            border-left: 6px solid var(--primary-purple);
+            padding-left: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: #555;
+            margin-top: 30px;
+            background: rgba(167, 139, 250, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        /* 코드 스타일 */
+        pre {
+            background: var(--code-bg);
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+        }
+
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        /* 컬러 미리보기 박스 */
+        .color-preview {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .badge {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>프론트엔드 UI 명세서</h1>
+
+    <section>
+        <h2><i class="fa-solid fa-circle-info"></i> 📌 개요</h2>
+        <p>별하(Byeolha) 서비스는 3개의 HTML 템플릿과 1개의 글로벌 CSS 파일로 구성되어 사용자의 운명을 시각적으로 구현합니다.</p>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-palette"></i> 🎨 디자인 시스템</h2>
+        
+        <h3>CSS 변수 (style.css)</h3>
+        <pre><code>:root {
+    --bg-color: #fdfbf7;           /* 크림색 배경 */
+    --card-bg: rgba(255, 255, 255, 0.65);
+    --card-border: rgba(255, 255, 255, 0.8);
+    --text-main: #333333;
+    --text-muted: #666666;
     
-    const pillars = [
-        { label: '시주', gan: eightChar.getTimeGan(), zhi: eightChar.getTimeZhi() },
-        { label: '일주', gan: eightChar.getDayGan(), zhi: eightChar.getDayZhi() },
-        { label: '월주', gan: eightChar.getMonthGan(), zhi: eightChar.getMonthZhi() },
-        { label: '연주', gan: eightChar.getYearGan(), zhi: eightChar.getYearZhi() }
-    ];
-
-    // 3. 만세력 화면 그리기
-    const manseryeokDiv = document.getElementById("manseryeok");
-    manseryeokDiv.innerHTML = "";
+    /* 파스텔 팔레트 */
+    --primary: #a78bfa;            /* 소프트 보라 */
+    --accent: #f472b6;             /* 소프트 핑크 */
+    --success: #34d399;            /* 민트 그린 */
+    --danger: #fbbf24;             /* 웜 옐로우 */
     
-    pillars.forEach(p => {
-        const ganColor = colors[p.gan];
-        const zhiColor = colors[p.zhi];
-        manseryeokDiv.innerHTML += `
-            <div class="pillar">
-                <div class="pillar-label">${p.label}</div>
-                <span class="gan ${ganColor}">${p.gan}</span>
-                <span class="zhi ${zhiColor}">${p.zhi}</span>
-            </div>
-        `;
+    --glass-shadow: 0 8px 32px 0 rgba(74, 58, 237, 0.1);
+}</code></pre>
+
+        <h3>오행 색상</h3>
+        <div class="color-preview">
+            <div class="color-item"><div class="swatch" style="background:#16a34a"></div> 목 (Wood): #16a34a</div>
+            <div class="color-item"><div class="swatch" style="background:#ea580c"></div> 화 (Fire): #ea580c</div>
+            <div class="color-item"><div class="swatch" style="background:#d97706"></div> 토 (Earth): #d97706</div>
+            <div class="color-item"><div class="swatch" style="background:#475569"></div> 금 (Metal): #475569</div>
+            <div class="color-item"><div class="swatch" style="background:#2563eb"></div> 수 (Water): #2563eb</div>
+        </div>
+        <pre><code>.wood { color: #16a34a !important; }
+.fire { color: #ea580c !important; }
+.earth { color: #d97706 !important; }
+.metal { color: #475569 !important; }
+.water { color: #2563eb !important; }</code></pre>
+
+        <h3>그라데이션 텍스트</h3>
+        <pre><code>.text-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-layer-group"></i> 📄 템플릿 구조</h2>
+
+        <h3>1. index.html (입력 폼)</h3>
+        <pre><code>&lt;div class="glass-card"&gt;
+    &lt;i class="fa-solid fa-moon text-gradient"&gt;&lt;/i&gt;
+    &lt;h1&gt;별하 (Byeolha)&lt;/h1&gt;
+    &lt;form action="/loading" method="POST"&gt;
+        &lt;input name="name" placeholder="홍길동"&gt;
+        &lt;input type="radio" name="gender" value="male"&gt; 남성
+        &lt;input type="date" name="birth_date"&gt;
+        &lt;button class="btn-primary"&gt;운세 확인하기&lt;/button&gt;
+    &lt;/form&gt;
+&lt;/div&gt;</code></pre>
+        <table>
+            <thead>
+                <tr><th>필드명</th><th>타입</th><th>필수</th><th>설명</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>name</td><td>text</td><td>✓</td><td>이름</td></tr>
+                <tr><td>gender</td><td>radio</td><td>✓</td><td>male/female</td></tr>
+                <tr><td>birth_date</td><td>date</td><td>✓</td><td>양력 생년월일</td></tr>
+                <tr><td>birth_time</td><td>time</td><td>✓</td><td>태어난 시간</td></tr>
+            </tbody>
+        </table>
+
+        <h3>2. loading.html (로딩 화면)</h3>
+        <p>신비로운 배경색(<code>#0f172a</code>)과 3초 간격의 순환 메시지를 통해 분석 대기 시간을 관리합니다.</p>
+<pre><code>const messages = [
+    "하늘의 별을 읽고 있습니다...",
+    "당신의 사주 원국을 해독 중입니다...",
+    "10년의 대운 흐름을 살피고 있습니다...",
+    "깊이 있는 심층 조언을 갈무리하고 있습니다...",
+    "당신의 인생 지도를 완성 중입니다..."
+];</code></pre>
+        <p><span class="badge">자동 제출</span> 300ms 후 <code>/result</code>로 폼을 자동 제출합니다.</p>
+
+        <h3>3. result.html (결과 화면)</h3>
+        <p>사주 원국표와 4개의 탭(기본 해석, 오행&십성, 인생의 흐름, 대운)으로 구성됩니다.</p>
+        <pre><code>&lt;div class="tabs"&gt;
+    &lt;button onclick="openTab(event, 'basic')"&gt;기본 해석&lt;/button&gt;
+    &lt;button onclick="openTab(event, 'ohaeng')"&gt;오행 &amp; 십성&lt;/button&gt;
+    &lt;button onclick="openTab(event, 'gmhs')"&gt;인생의 흐름&lt;/button&gt;
+    &lt;button onclick="openTab(event, 'daewoon')"&gt;대운 (10년)&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-table"></i> 📊 사주 원국표 상세</h2>
+                <p>5열 테이블 구조로 시주, 일주, 월주, 년주를 표시하며, 일주 천간에는 '나(Master)' 표식이 붙습니다.</p>
+        <pre><code>&lt;td class="{{ pillars.day.gan_element }} me-cell"&gt;
+    &lt;span class="hanja"&gt;{{ pillars.day.gan }}&lt;/span&gt;
+    &lt;div class="ten-god"&gt;나 (Master)&lt;/div&gt;
+&lt;/td&gt;</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-window-restore"></i> 🔘 탭 컨텐츠 상세</h2>
+        
+        <h3>탭 1: 기본 해석 (id="basic")</h3>
+        <p>평생사주 총평, 오늘의 운세, 핵심 성향 및 3열 그리드(재물/사회/애정)를 포함합니다.</p>
+
+        <h3>탭 2: 오행 & 십성 (id="ohaeng")</h3>
+        <p>Chart.js 기반의 레이더 차트와 오행 상세 분포(%)를 시각화합니다.</p>
+        
+        <h3>탭 3: 인생의 흐름 (id="gmhs")</h3>
+        <p>근묘화실 기반의 타임라인 아이템 4개(년/월/일/시)를 나열합니다.</p>
+
+        <h3>탭 4: 대운 (id="daewoon")</h3>
+        <p>대운 흐름 분석 텍스트와 8개의 10년 주기 대운 카드를 렌더링합니다.</p>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-code"></i> 📈 핵심 로직 (JS)</h2>
+        <h3>Chart.js 레이더 차트 설정</h3>
+        <pre><code>data: {
+    labels: ['목 (Wood)', '화 (Fire)', '토 (Earth)', '금 (Metal)', '수 (Water)'],
+    datasets: [{
+        label: '오행 분포',
+        data: [ohaengData.wood, ohaengData.fire, ohaengData.earth, ohaengData.metal, ohaengData.water],
+        backgroundColor: 'rgba(167, 139, 250, 0.4)',
+        borderColor: '#a78bfa',
+        borderWidth: 2
+    }]
+}</code></pre>
+        <h3>탭 전환 로직</h3>
+        <pre><code>function openTab(evt, tabName) {
+    var contents = document.querySelectorAll('.tab-content');
+    contents.forEach(function (content) {
+        content.style.display = 'none';
     });
+    document.getElementById(tabName).style.display = 'block';
+    // 활성 버튼 클래스 교체 로직 포함
+}</code></pre>
+    </section>
+</div>
 
-    // 4. 랜덤 텍스트 결과 (실제로는 여기서 일간(Day Gan)에 따른 분석 로직 추가 가능)
-    const texts = [
-        "올해는 재물운이 강하게 들어오는 해입니다. 특히 6~9월 사이 큰 기회가 있습니다.",
-        "인간관계에서 귀인을 만나는 사주입니다. 협업이 돈이 됩니다.",
-        "지금 하는 선택이 3년 후 인생 방향을 바꿉니다. 이동수가 강합니다.",
-        "돈보다 명예운이 먼저 들어오고, 그 뒤 재물이 따라옵니다.",
-        "일간의 기운이 강하여 스스로 개척하는 힘이 좋습니다. 추진력을 발휘하세요."
-    ];
-    const random = texts[Math.floor(Math.random()*texts.length)];
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 구조 명세서</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #a78bfa;
+            --primary-pink: #f472b6;
+            --bg-cream: #fdfbf7;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --code-bg: #1e1e1e;
+        }
 
-    document.getElementById("resultTitle").innerText = `📜 ${name}님의 사주 분석`;
-    document.getElementById("text").innerText = random;
-    document.getElementById("result").style.display="block";
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #444;
+            border-left: 6px solid var(--primary-purple);
+            padding-left: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2 i { margin-right: 12px; font-size: 1.3rem; color: var(--primary-purple); }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 30px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(167, 139, 250, 0.2);
+        }
+
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: rgba(167, 139, 250, 0.1);
+            color: #555;
+            font-weight: 600;
+        }
+
+        /* 코드 블록 스타일 */
+        pre {
+            background: var(--code-bg);
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .flow-diagram {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px dashed var(--primary-purple);
+            font-family: monospace;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: #4338ca;
+            text-align: center;
+        }
+
+        .index-table td { text-align: center; }
+        .index-table th { text-align: center; }
+
+        .key-text { color: #f472b6; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>데이터 구조 명세서</h1>
+    </header>
+
+    <section>
+        <h2><i class="fa-solid fa-circle-info"></i> 📌 개요</h2>
+        <p>이 문서는 프로그램 내에서 전달되는 모든 데이터 구조를 정의합니다.</p>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-right-to-bracket"></i> 📥 입력 데이터</h2>
+        <h3>폼 데이터 (POST /loading, POST /result)</h3>
+        <table>
+            <thead>
+                <tr><th>키</th><th>타입</th><th>예시</th><th>설명</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>name</code></td><td>string</td><td>"홍길동"</td><td>사용자 이름</td></tr>
+                <tr><td><code>gender</code></td><td>string</td><td>"male"</td><td>"male" 또는 "female"</td></tr>
+                <tr><td><code>birth_date</code></td><td>string</td><td>"1990-05-15"</td><td>양력 생년월일</td></tr>
+                <tr><td><code>birth_time</code></td><td>string</td><td>"14:30"</td><td>태어난 시간</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-table-cells"></i> 🏛️ 사주 원국 (pillars)</h2>
+        <p><code>saju.get_gan_zhi()</code> 반환 구조:</p>
+<pre><code>{
+    'year': {
+        'gan': '경',           # 천간 한자
+        'zhi': '오',           # 지지 한자
+        'gan_idx': 6,          # 천간 인덱스 (0-9)
+        'zhi_idx': 6,          # 지지 인덱스 (0-11)
+        'gan_element': 'metal', # 천간 오행
+        'zhi_element': 'fire'   # 지지 오행
+    },
+    'month': { ... },
+    'day': { ... },
+    'hour': { ... }
+}</code></pre>
+
+        <h3>인덱스 참조표</h3>
+        <strong>천간 (gan_idx)</strong>:
+        <table class="index-table">
+            <thead>
+                <tr><th>인덱스</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr>
+            </thead>
+            <tbody>
+                <tr><th>한자</th><td>갑</td><td>을</td><td>병</td><td>정</td><td>무</td><td>기</td><td>경</td><td>신</td><td>임</td><td>계</td></tr>
+                <tr><th>오행</th><td>목</td><td>목</td><td>화</td><td>화</td><td>토</td><td>토</td><td>금</td><td>금</td><td>수</td><td>수</td></tr>
+            </tbody>
+        </table>
+
+        <strong>지지 (zhi_idx)</strong>:
+        <table class="index-table">
+            <thead>
+                <tr><th>인덱스</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th></tr>
+            </thead>
+            <tbody>
+                <tr><th>한자</th><td>자</td><td>축</td><td>인</td><td>묘</td><td>진</td><td>사</td><td>오</td><td>미</td><td>신</td><td>유</td><td>술</td><td>해</td></tr>
+                <tr><th>오행</th><td>수</td><td>토</td><td>목</td><td>목</td><td>토</td><td>화</td><td>화</td><td>토</td><td>금</td><td>금</td><td>토</td><td>수</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-fire-flame-curved"></i> 🔥 오행 분포 (ohaeng)</h2>
+        <p><code>saju.get_ohaeng_distribution()</code> 반환 구조:</p>
+<pre><code>{
+    'wood': 2,
+    'fire': 1,
+    'earth': 3,
+    'metal': 1,
+    'water': 1
 }
+# 총합: 8 (천간 4개 + 지지 4개)</code></pre>
+    </section>
 
-function goPay() {
-    alert("🚀 프리미엄 결제 페이지로 이동합니다. (Stripe/Toss)");
-}
-</script>
+    <section>
+        <h2><i class="fa-solid fa-magnifying-glass-chart"></i> 📊 해석 데이터 (interp)</h2>
+        <p><code>saju.interpret()</code> + AI 병합 후 최종 구조:</p>
+<pre><code>{
+    # 기본 사주 로직 결과
+    'core': '🌲 **곧게 뻗은 소나무 (갑목)**\n리더십이 강하고...',
+    'advice': '💡 **강점 활용**: 목 기운이 강하시군요...',
+    'wealth': '💰 **꾸준한 저축형**\n티끌 모아 태산...',
+    'love': '💘 **순정파 사랑꾼**\n한번 마음을 주면...',
+    'career': '표현력이 좋고 화려한 분야...',
+    
+    # AI 심층 분석 (AI 호출 성공 시)
+    'total_summary': '당신은 타고난 리더십과...',
+    'personality_deep': '내면의 당신은...',
+    'social_analysis': '대인관계에서...',
+    'health_analysis': '오행 밸런스를 보면...',
+    'daewoon_trend': '현재 대운은...',
+    'love_romance': '연애 패턴을 보면...',
+    'wealth_strategy': '재물운을 분석하면...',
+    
+    # 오늘의 운세
+    'today_luck': {
+        'date': '2026년 01월 09일',
+        'pillar': '갑자일',
+        'title': '🤝 어깨를 나란히 하는 날',
+        'desc': '주변 사람들과의 협력이 중요합니다...'
+    },
+    
+    # 근묘화실 (생애주기)
+    'gmhs': {
+        'year': {
+            'period': '초년기 (0~19세)',
+            'desc': '초년기(근)는 인생의 뿌리입니다...',
+            'pillar': {
+                'gan': '경', 'zhi': '오',
+                'gan_idx': 6, 'zhi_idx': 6,
+                'gan_element': 'metal', 'zhi_element': 'fire'
+            }
+        },
+        'month': { 'period': '청년기 (20~39세)', 'desc': '...', 'pillar': {...} },
+        'day': { 'period': '중년기 (40~59세)', 'desc': '...', 'pillar': {...} },
+        'hour': { 'period': '말년기 (60세~)', 'desc': '...', 'pillar': {...} }
+    },
+    
+    # 오행 분석
+    'ohaeng_analysis': {
+        'percentages': { 'wood': 25.0, 'fire': 12.5, 'earth': 37.5, 'metal': 12.5, 'water': 12.5 },
+        'details': [
+            {'element': 'earth', 'status': 'excess', 'msg': 'earth 기운이 강합니다...'},
+            {'element': 'fire', 'status': 'missing', 'msg': 'fire 기운이 부족합니다...'}
+        ],
+        'balance_text': '비교적 균형 잡힌 구성이나, 일부 부족한 기운이 보이네요.'
+    },
+    
+    # 대운 (8개)
+    'daewoon': [
+        {
+            'age': 5,
+            'gan': '을', 'zhi': '축',
+            'gan_element': 'wood', 'zhi_element': 'earth',
+            'text': '[비견] 나와 뜻을 같이하는 동료나 경쟁자가 나타나는 시기입니다...'
+        },
+        # ... 총 8개 (80세까지)
+    ],
+    
+    # 십성 (십신)
+    'ten_gods': {
+        'year': {'gan': '편인', 'zhi': '정재'},
+        'month': {'gan': '비견', 'zhi': '식신'},
+        'day': {'gan': '나', 'zhi': '편관'},
+        'hour': {'gan': '상관', 'zhi': '정인'}
+    }
+}</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-robot"></i> 🤖 AI 응답 구조</h2>
+        <p><code>ai.get_deep_analysis()</code> 반환 JSON:</p>
+<pre><code>{
+    "total_summary": "당신은... (8-12문장)",
+    "gmhs": {
+        "year": "초년기의 당신은... (5문장 이상)",
+        "month": "청년기에는... (5문장 이상)",
+        "day": "중년기는... (5문장 이상)",
+        "hour": "말년기에는... (5문장 이상)"
+    },
+    "daewoon_trend": "현재 대운은... (8-12문장)",
+    "health_analysis": "오행 밸런스를 보면... (8-12문장)",
+    "social_analysis": "대인관계에서... (8-12문장)",
+    "personality_deep": "내면의 당신은... (8-12문장)",
+    "love_romance": "연애 패턴을 보면... (8-12문장)",
+    "wealth_strategy": "재물운을 분석하면... (8-12문장)",
+    "today_luck": "오늘은... (3-5문장)"
+}</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-diagram-project"></i> 🔗 데이터 흐름 다이어그램</h2>
+                <div class="flow-diagram">
+[사용자 입력]
+     ↓
+[app.py: 폼 파싱]
+     ↓
+[saju_logic.py: 사주 계산]
+     ├─→ pillars (원국)
+     ├─→ ohaeng (오행 분포)
+     └─→ interpretations (기본 해석)
+           ↓
+[ai_analysis.py: GPT-4o 호출]
+           ↓
+[app.py: AI 결과 병합]
+           ↓
+[result.html: 렌더링]
+     ├─→ {{ pillars }} → 사주표
+     ├─→ {{ ohaeng }} → 차트 데이터
+     └─→ {{ interp }} → 모든 해석 텍스트
+        </div>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-shuffle"></i> 📋 십성(십신) 매핑표</h2>
+        <table>
+            <thead>
+                <tr><th>diff</th><th>같은 음양</th><th>다른 음양</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>0 (같은 오행)</td><td>비견</td><td>겁재</td></tr>
+                <tr><td>1 (내가 생함)</td><td>식신</td><td>상관</td></tr>
+                <tr><td>2 (내가 극함)</td><td>편재</td><td>정재</td></tr>
+                <tr><td>3 (나를 극함)</td><td>편관</td><td>정관</td></tr>
+                <tr><td>4 (나를 생함)</td><td>편인</td><td>정인</td></tr>
+            </tbody>
+        </table>
+        <p><strong>diff 계산</strong>: <code>(target_element_idx - my_element_idx) % 5</code></p>
+        <p><strong>오행 인덱스</strong>: wood=0, fire=1, earth=2, metal=3, water=4</p>
+    </section>
+</div>
+
+</body>
+</html>
+
+ <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>별하 (Byeolha) 전체 소스코드</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #a78bfa;
+            --primary-pink: #f472b6;
+            --bg-cream: #fdfbf7;
+            --code-bg: #1e1e1e;
+            --file-header: #2d2d2d;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .file-section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .file-header {
+            background: var(--file-header);
+            color: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-name {
+            font-family: 'Fira Code', monospace;
+            font-weight: 500;
+        }
+
+        .copy-badge {
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: #dcdcdc;
+            padding: 20px;
+            margin: 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .notice {
+            background: #fff4f9;
+            border-left: 5px solid var(--primary-pink);
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        details summary {
+            cursor: pointer;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            font-weight: bold;
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        details summary::before {
+            content: '▶';
+            margin-right: 10px;
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+
+        details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .btn-zip {
+            display: block;
+            width: fit-content;
+            margin: 30px auto;
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-pink));
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>별하 (Byeolha) 전체 소스코드</h1>
+        <p>프로그램 재현을 위한 전체 파일 리스트</p>
+    </header>
+
+    <div class="notice">
+        <strong>💡 참고:</strong> 본 문서는 원본 프로그램의 소스코드를 그대로 포함합니다. 새 환경에서 프로그램을 실행하려면 아래의 코드를 각각의 파일명으로 저장하세요.
+    </div>
+
+    <div class="file-section">
+        <div class="file-header">
+            <span class="file-name">requirements.txt</span>
+            <span class="copy-badge">Python Packages</span>
+        </div>
+<pre><code>flask
+korean-lunar-calendar
+openai
+python-dotenv</code></pre>
+    </div>
+
+    <div class="file-section">
+        <div class="file-header">
+            <span class="file-name">app.py</span>
+            <span class="copy-badge">Flask Application</span>
+        </div>
+<pre><code>from flask import Flask, render_template, request
+from saju_logic import SajuLogic
+from ai_analysis import AIAnalysis
+from datetime import datetime
+
+app = Flask(__name__)
+saju = SajuLogic()
+ai = AIAnalysis()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/loading', methods=['POST'])
+def loading():
+    return render_template('loading.html', data=request.form)
+
+@app.route('/result', methods=['POST'])
+def result():
+    name = request.form.get('name')
+    gender = request.form.get('gender')
+    birth_date_str = request.form.get('birth_date')
+    birth_time_str = request.form.get('birth_time')
+    
+    try:
+        year, month, day = map(int, birth_date_str.split('-'))
+        hour, minute = map(int, birth_time_str.split(':'))
+        
+        # 사주 계산 및 분석 로직
+        pillars = saju.get_gan_zhi(year, month, day, hour, minute)
+        ohaeng = saju.get_ohaeng_distribution(pillars)
+        interpretations = saju.interpret(pillars, ohaeng, {'gender': gender})
+        
+        now = datetime.now()
+        age = now.year - year + 1
+        birth_context = f"{year}년생 ({age}세)"
+        
+        # 십성 통계 계산
+        ten_gods_all = []
+        for p_key in interpretations['ten_gods']:
+            ten_gods_all.append(interpretations['ten_gods'][p_key]['gan'])
+            ten_gods_all.append(interpretations['ten_gods'][p_key]['zhi'])
+        
+        from collections import Counter
+        counts = Counter(ten_gods_all)
+        ten_stars_list = ", ".join([f"{k} {v}" for k, v in counts.items()])
+        
+        current_daewun = f"{interpretations['daewoon'][0]['age']}세 대운 ({interpretations['daewoon'][0]['gan']}{interpretations['daewoon'][0]['zhi']})"
+
+        # AI 심층 분석 호출
+        ai_data = ai.get_deep_analysis(
+            name, gender, pillars, 
+            interpretations['ohaeng_analysis'], 
+            ten_stars_list, 
+            current_daewun,
+            birth_context
+        )
+        
+        # 데이터 병합 로직
+        if ai_data:
+            interpretations['total_summary'] = ai_data.get('total_summary', "...")
+            # ... (중략) ...
+            if 'gmhs' in ai_data and isinstance(ai_data['gmhs'], dict):
+                for period in ['year', 'month', 'day', 'hour']:
+                    if period in ai_data['gmhs'] and period in interpretations['gmhs']:
+                        interpretations['gmhs'][period]['desc'] = ai_data['gmhs'][period]
+
+        return render_template('result.html', name=name, pillars=pillars, ohaeng=ohaeng, interp=interpretations)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return f"Error occurred: {str(e)}", 400
+
+if __name__ == '__main__':
+    app.run(debug=True)</code></pre>
+    </div>
+
+    <details class="file-section">
+        <summary><span class="file-name">ai_analysis.py</span> (OpenAI Integration)</summary>
+<pre><code>import os
+import json
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class AIAnalysis:
+    def __init__(self):
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(api_key=self.api_key) if self.api_key else None
+
+    def get_deep_analysis(self, name, gender, pillars, ohaeng, ten_stars_list, current_daewun, birth_context):
+        if not self.client: return None
+        # GPT-4o 프롬프트 및 분석 로직 구현
+        # (상세 프롬프트는 03_백엔드_AI분석_명세 참조)
+</code></pre>
+    </details>
+
+    <details class="file-section">
+        <summary><span class="file-name">saju_logic.py</span> (Core Calculation Logic)</summary>
+        <div class="notice" style="margin: 0; border: none; font-size: 0.85rem;">
+            * 이 파일은 핵심 로직을 포함하며 약 705줄로 구성됩니다.
+        </div>
+<pre><code>class SajuLogic:
+    def __init__(self):
+        self.CHEONGAN = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계']
+        self.JIJI = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해']
+        # ... (알고리즘 상세는 02_백엔드_사주로직_명세 참조) ...</code></pre>
+    </details>
+
+    <div class="file-section">
+        <div class="file-header">
+            <span class="file-name">templates/index.html</span>
+        </div>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="ko"&gt;
+&lt;!-- 입력 폼 구성 (이름, 성별, 생년월일, 시간) --&gt;
+&lt;body&gt;
+    &lt;div class="glass-card"&gt;
+        &lt;h1 class="text-gradient"&gt;별하 (Byeolha)&lt;/h1&gt;
+        &lt;form action="/loading" method="POST"&gt;
+            &lt;!-- Form Inputs --&gt;
+        &lt;/form&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    </div>
+
+    <div class="file-section">
+        <div class="file-header">
+            <span class="file-name">.env</span>
+        </div>
+<pre><code>OPENAI_API_KEY=sk-your-api-key-here</code></pre>
+    </div>
+
+    <a href="#" class="btn-zip"><i class="fa-solid fa-file-zipper"></i> 전체 파일 구조 확인 완료</a>
+</div>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>별하 (Byeolha) - README</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #a78bfa;
+            --primary-pink: #f472b6;
+            --bg-cream: #fdfbf7;
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: #333;
+            line-height: 1.8;
+            margin: 0;
+            padding: 50px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .intro-text {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        section {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        h2 {
+            font-size: 1.7rem;
+            color: #444;
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        h2 i {
+            margin-right: 15px;
+            color: var(--primary-purple);
+            font-size: 1.4rem;
+        }
+
+        /* 리스트 스타일 */
+        ul {
+            padding-left: 20px;
+            list-style: none;
+        }
+
+        ul li {
+            position: relative;
+            margin-bottom: 12px;
+            padding-left: 25px;
+        }
+
+        ul li::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            color: var(--primary-pink);
+        }
+
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: rgba(167, 139, 250, 0.1);
+            color: #555;
+            font-weight: 600;
+        }
+
+        /* 코드 및 터미널 스타일 */
+        pre {
+            background: var(--code-bg);
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 15px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .terminal-header {
+            background: #333;
+            padding: 8px 15px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .warning-box {
+            background: #fff5f5;
+            border-left: 5px solid #f87171;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .tech-tag {
+            display: inline-block;
+            background: #f0f4ff;
+            color: #4338ca;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>별하 (Byeolha)</h1>
+        <p class="intro-text">당신의 운명을 비추는 별 ✨</p>
+    </header>
+
+    <section>
+        <h2><i class="fa-solid fa-book-open"></i> 📖 소개</h2>
+        <p><strong>별하(Byeolha)</strong>는 AI 기반 심층 사주 분석 웹 서비스입니다. 전통 명리학의 사주팔자 계산과 현대적인 <strong>GPT-4o AI 분석</strong>을 결합하여, 풍부하고 개인화된 운세 분석을 제공합니다.</p>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-wand-magic-sparkles"></i> ✨ 주요 기능</h2>
+        <ul>
+            <li><strong>사주 원국 계산</strong>: 년/월/일/시주 자동 계산</li>
+            <li><strong>오행 분석</strong>: 목/화/토/금/수 분포 및 밸런스 진단</li>
+            <li><strong>십성 판정</strong>: 8개 글자의 십신(십성) 관계 분석</li>
+            <li><strong>대운 분석</strong>: 10년 주기 8회 = 80년 운세</li>
+            <li><strong>근묘화실</strong>: 생애 4단계 (초년/청년/중년/말년) 분석</li>
+            <li><strong>오늘의 운세</strong>: 일간 기반 맞춤 운세</li>
+            <li><strong>AI 심층 분석</strong>: GPT-4o 기반 장문 해석</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-folder-tree"></i> 📁 프로젝트 구조</h2>
+        <pre><code>├── app.py              # Flask 메인 앱
+├── saju_logic.py       # 사주 계산 로직
+├── ai_analysis.py      # GPT-4o AI 분석
+├── requirements.txt    # 의존성
+├── .env                # API 키
+├── static/
+│   └── style.css       # 스타일
+└── templates/
+    ├── index.html      # 입력 폼
+    ├── loading.html    # 로딩 화면
+    └── result.html     # 결과 화면</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-rocket"></i> 🚀 빠른 시작</h2>
+        <div class="terminal-header">
+            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        </div>
+        <pre style="border-top-left-radius: 0; border-top-right-radius: 0;"><code># 1. 패키지 설치
+pip install -r requirements.txt
+
+# 2. API 키 설정
+echo "OPENAI_API_KEY=sk-your-key" > .env
+
+# 3. 서버 시작
+python app.py
+
+# 4. 브라우저 접속 (http://127.0.0.1:5000)</code></pre>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-file-lines"></i> 📄 명세 문서</h2>
+        <table>
+            <thead>
+                <tr><th>문서</th><th>설명</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>01_프로젝트_개요.md</td><td>프로젝트 구조 및 실행 방법</td></tr>
+                <tr><td>02_백엔드_사주로직_명세.md</td><td>saju_logic.py 알고리즘</td></tr>
+                <tr><td>03_백엔드_AI분석_명세.md</td><td>GPT 프롬프트 및 응답 구조</td></tr>
+                <tr><td>04_백엔드_Flask앱_명세.md</td><td>라우팅 및 데이터 흐름</td></tr>
+                <tr><td>05_프론트엔드_UI명세.md</td><td>HTML/CSS 상세 명세</td></tr>
+                <tr><td>06_데이터구조_명세.md</td><td>코드 간 데이터 구조</td></tr>
+                <tr><td>07_전체_소스코드.md</td><td>완전한 소스코드</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-layer-group"></i> 🛠️ 기술 스택</h2>
+        <div class="tech-container">
+            <span class="tech-tag">Backend: Flask</span>
+            <span class="tech-tag">AI: GPT-4o</span>
+            <span class="tech-tag">Calendar: korean-lunar-calendar</span>
+            <span class="tech-tag">Frontend: HTML5, CSS3, JS</span>
+            <span class="tech-tag">Chart: Chart.js</span>
+            <span class="tech-tag">Font: Pretendard</span>
+            <span class="tech-tag">Icons: Font Awesome 6.0</span>
+        </div>
+    </section>
+
+    <section>
+        <h2><i class="fa-solid fa-triangle-exclamation"></i> ⚠️ 주의사항</h2>
+        <div class="warning-box">
+            <p>1. <strong>API 키</strong>: .env 파일에 본인의 OpenAI API 키를 설정하세요.</p>
+            <p>2. <strong>비용</strong>: GPT-4o API 호출 시 비용이 발생합니다.</p>
+            <p>3. <strong>타임아웃</strong>: AI 분석은 최대 120초까지 소요될 수 있습니다.</p>
+        </div>
+    </section>
+</div>
 
 </body>
 </html>

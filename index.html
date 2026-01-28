@@ -1116,7 +1116,15 @@
     </div>
 
     <!-- UI Logic -->
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js"
+        integrity="sha384-l+xbElFSnP5k7wJKz52J1GOvbIV1x1i2cQ2p1OdyKdAZM0sRM5CGhC8PF28hX61j"
+        crossorigin="anonymous"></script>
     <script>
+        // Kakao Init
+        try {
+            Kakao.init('0b22a360c885cdccf589e74be85b6710');
+        } catch (e) { console.log('Kakao Init Err', e); }
+
         const CHEONGAN = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'];
         const JIJI = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해'];
         const ELEM = ['wood', 'wood', 'fire', 'fire', 'earth', 'earth', 'metal', 'metal', 'water', 'water'];
@@ -1134,9 +1142,35 @@
 
         // --- AUTH ---
         function login(provider) {
-            // Simulate Login
+            if (provider === 'kakao') {
+                // Real Kakao Login
+                Kakao.Auth.login({
+                    success: function (authObj) {
+                        Kakao.API.request({
+                            url: '/v2/user/me',
+                            success: function (res) {
+                                const nick = res.properties.nickname;
+                                alert(nick + '님 환영합니다! (카카오 로그인 성공)');
+                                currentUser = nick;
+                                updateProfileUI();
+                            },
+                            fail: function (error) {
+                                alert('사용자 정보 요청 실패: ' + JSON.stringify(error));
+                                // Fallback
+                                currentUser = "KakaoUser";
+                                updateProfileUI();
+                            }
+                        });
+                    },
+                    fail: function (err) {
+                        alert('로그인 실패: ' + JSON.stringify(err));
+                    },
+                });
+                return;
+            }
+
+            // Simulate Others
             const msgs = {
-                'kakao': '카카오 로그인 성공! 환영합니다.',
                 'naver': '네이버 아이디로 연결되었습니다.',
                 'google': 'Google 계정 확인 완료.',
                 'apple': 'Apple ID로 로그인되었습니다.',
@@ -1144,11 +1178,12 @@
             };
             alert(msgs[provider] || "로그인 성공");
             currentUser = "Guest";
-            if (provider === 'kakao') currentUser = "김kakao";
             if (provider === 'naver') currentUser = "이naver";
+            updateProfileUI();
+        }
 
+        function updateProfileUI() {
             document.getElementById('user-profile').innerHTML = `<i class="fa-solid fa-user"></i> ${currentUser}님`;
-
             document.getElementById('screen-login').classList.add('hidden');
             document.getElementById('screen-home').classList.remove('hidden');
         }
@@ -1161,176 +1196,168 @@
                 document.getElementById('screen-lotto').classList.remove('hidden');
                 return;
             }
-            // --- NAVIGATION ---
-            function openInput(cat) {
-                selectedCategory = cat;
-                if (cat === 'lotto') {
-                    document.getElementById('screen-home').classList.add('hidden');
-                    document.getElementById('screen-lotto').classList.remove('hidden');
-                    return;
-                }
-                if (cat === 'tarot') {
-                    document.getElementById('screen-home').classList.add('hidden');
-                    document.getElementById('screen-tarot').classList.remove('hidden');
-                    initTarot();
-                    return;
-                }
-                if (cat === 'face' || cat === 'palm') {
-                    document.getElementById('screen-home').classList.add('hidden');
-                    document.getElementById('screen-photo').classList.remove('hidden');
-                    document.getElementById('photo-title').innerText = (cat === 'face') ? "AI 관상 분석" : "AI 손금 분석";
-                    // Reset
-                    document.getElementById('upload-preview').style.display = 'none';
-                    document.getElementById('upload-placeholder').style.display = 'block';
-                    document.getElementById('photo-input').value = '';
-                    return;
-                }
-
+            if (cat === 'tarot') {
                 document.getElementById('screen-home').classList.add('hidden');
-                document.getElementById('screen-input').classList.remove('hidden');
-                window.scrollTo(0, 0);
+                document.getElementById('screen-tarot').classList.remove('hidden');
+                initTarot();
+                return;
+            }
+            if (cat === 'face' || cat === 'palm') {
+                document.getElementById('screen-home').classList.add('hidden');
+                document.getElementById('screen-photo').classList.remove('hidden');
+                document.getElementById('photo-title').innerText = (cat === 'face') ? "AI 관상 분석" : "AI 손금 분석";
+                // Reset
+                document.getElementById('upload-preview').style.display = 'none';
+                document.getElementById('upload-placeholder').style.display = 'block';
+                document.getElementById('photo-input').value = '';
+                return;
             }
 
-            function goHome() {
-                document.getElementById('screen-result').classList.add('hidden');
-                document.getElementById('screen-input').classList.add('hidden');
-                document.getElementById('screen-photo').classList.add('hidden');
-                document.getElementById('screen-lotto').classList.add('hidden');
-                document.getElementById('screen-tarot').classList.add('hidden');
-                document.getElementById('screen-home').classList.remove('hidden');
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-input').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function goHome() {
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-input').classList.add('hidden');
+            document.getElementById('screen-photo').classList.add('hidden');
+            document.getElementById('screen-lotto').classList.add('hidden');
+            document.getElementById('screen-tarot').classList.add('hidden');
+            document.getElementById('screen-home').classList.remove('hidden');
+        }
+
+        function selectRadio(group, value, el) {
+            document.getElementById(group).value = value;
+            document.querySelectorAll(`#${group}-group .radio-btn`).forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // --- SAJU LOGIC (PRECISION UPGRADE) ---
+        function getGanZhiPrecies(year, month, day, hour, min, isYaja) {
+            // 1. Solar Term Approximation (LiChun)
+            // Ideally needs astronomical table. Here we use a high-precision approximation for MVP.
+            // LiChun is usually Feb 4th around 04:00~19:00 UTC depending on year.
+            // Simplified Rule: If Month < 2, or (Month==2 and Day < 4), use Prev Year.
+            // *Upgrade*: If Month==2 and Day==4, check Hour. (Approximating cut-off at 12:00 for demo)
+            let isBeforeLiChun = false;
+            if (month < 2) isBeforeLiChun = true;
+            else if (month === 2) {
+                if (day < 4) isBeforeLiChun = true;
+                else if (day === 4 && hour < 12) isBeforeLiChun = true; // Simple cut-off
             }
 
-            function selectRadio(group, value, el) {
-                document.getElementById(group).value = value;
-                document.querySelectorAll(`#${group}-group .radio-btn`).forEach(b => b.classList.remove('selected'));
-                el.classList.add('selected');
-            }
+            const cYear = isBeforeLiChun ? year - 1 : year;
 
-            // --- SAJU LOGIC (PRECISION UPGRADE) ---
-            function getGanZhiPrecies(year, month, day, hour, min, isYaja) {
-                // 1. Solar Term Approximation (LiChun)
-                // Ideally needs astronomical table. Here we use a high-precision approximation for MVP.
-                // LiChun is usually Feb 4th around 04:00~19:00 UTC depending on year.
-                // Simplified Rule: If Month < 2, or (Month==2 and Day < 4), use Prev Year.
-                // *Upgrade*: If Month==2 and Day==4, check Hour. (Approximating cut-off at 12:00 for demo)
-                let isBeforeLiChun = false;
-                if (month < 2) isBeforeLiChun = true;
-                else if (month === 2) {
-                    if (day < 4) isBeforeLiChun = true;
-                    else if (day === 4 && hour < 12) isBeforeLiChun = true; // Simple cut-off
+            // Year Pillar
+            const yearIdx = (cYear - 4) % 60;
+
+            // Month Pillar Logic (Solar)
+            // Needs exact solar term dates. Simplified map used in v1 is kept but structure allows expansion.
+            // We follow the user's "Command Logic" request structure.
+
+            // Day Pillar (Julian Date)
+            const base = new Date(1900, 0, 1);
+            const target = new Date(year, month - 1, day);
+            const diff = Math.floor((target - base) / (1000 * 60 * 60 * 24));
+            // 1900-01-01 was GAP-SUL (10)
+            const dayIdxRaw = (10 + diff) % 60;
+
+            // YAJA/JOJA Logic
+            // If Hour=23, and Yaja applied:
+            // Day Pillar: stays same (Today)
+            // Hour Pillar: uses Next Day's JA time logic
+            let dayIdx = dayIdxRaw;
+            let hVal = hour;
+
+            if (hour === 23) {
+                if (isYaja) {
+                    // Day is today, Hour is effectively tomorrow's start (Early Rat)
+                    // But hour calculation logic usually takes day stem.
+                    // Method: Treat as Next Day's Rat time for Hour Pillar, but keep Day Pillar same?
+                    // Standard Yaja: Day Stem used is TODAY. Hour Branch is Rat.
+                    // Standard Joja: Day Stem used is TOMORROW. 
+                    // Here we implement YAJA (Selectable).
+                } else {
+                    // Joja (Default or not selected): 23:00 is considered start of next day for EVERYTHING?
+                    // Or standard KR calendar: 23:00 is next day's Ja time.
+                    // Usually 23:00 is treated as Next Day.
+                    dayIdx = (dayIdx + 1) % 60;
+                    hVal = 0; // Treat as 00:00
                 }
-
-                const cYear = isBeforeLiChun ? year - 1 : year;
-
-                // Year Pillar
-                const yearIdx = (cYear - 4) % 60;
-
-                // Month Pillar Logic (Solar)
-                // Needs exact solar term dates. Simplified map used in v1 is kept but structure allows expansion.
-                // We follow the user's "Command Logic" request structure.
-
-                // Day Pillar (Julian Date)
-                const base = new Date(1900, 0, 1);
-                const target = new Date(year, month - 1, day);
-                const diff = Math.floor((target - base) / (1000 * 60 * 60 * 24));
-                // 1900-01-01 was GAP-SUL (10)
-                const dayIdxRaw = (10 + diff) % 60;
-
-                // YAJA/JOJA Logic
-                // If Hour=23, and Yaja applied:
-                // Day Pillar: stays same (Today)
-                // Hour Pillar: uses Next Day's JA time logic
-                let dayIdx = dayIdxRaw;
-                let hVal = hour;
-
-                if (hour === 23) {
-                    if (isYaja) {
-                        // Day is today, Hour is effectively tomorrow's start (Early Rat)
-                        // But hour calculation logic usually takes day stem.
-                        // Method: Treat as Next Day's Rat time for Hour Pillar, but keep Day Pillar same?
-                        // Standard Yaja: Day Stem used is TODAY. Hour Branch is Rat.
-                        // Standard Joja: Day Stem used is TOMORROW. 
-                        // Here we implement YAJA (Selectable).
-                    } else {
-                        // Joja (Default or not selected): 23:00 is considered start of next day for EVERYTHING?
-                        // Or standard KR calendar: 23:00 is next day's Ja time.
-                        // Usually 23:00 is treated as Next Day.
-                        dayIdx = (dayIdx + 1) % 60;
-                        hVal = 0; // Treat as 00:00
-                    }
-                }
-
-                const dayGan = dayIdx % 10;
-                const hourBranch = Math.floor((hVal + 1) / 2) % 12;
-
-                // Hour Gan: Derived from Day Gan
-                // Gap/Ki(0/5) -> Gap(0)
-                const hStart = [0, 2, 4, 6, 8][dayGan % 5];
-                const hourGan = (hStart + hourBranch) % 10;
-
-                // Month Calculation (Simplified again to keep file small)
-                // ... (Logic from v1 copied/refined)
-                const monthStartGan = [2, 4, 6, 8, 0][(yearIdx % 10) % 5];
-                let mOffset = (month - 2);
-                if (mOffset < 0) mOffset += 12;
-                const monthGan = (monthStartGan + mOffset) % 10;
-                const monthBranch = (month + 10) % 12; // 2->2(In)? No. Feb is In. JS Month 2 is Feb.
-                // JIJI: Ja(0), Chuk(1), In(2)... Feb is In.
-
-                return {
-                    y: { g: yearIdx % 10, z: yearIdx % 12 },
-                    m: { g: monthGan, z: (month - 1 + 12) % 12 + 2 }, // Rough fix
-                    d: { g: dayGan, z: dayIdx % 12 },
-                    h: { g: hourGan, z: hourBranch }
-                };
             }
 
-            // --- SUBMIT ---
-            document.getElementById('saju-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('name').value;
-                const gender = document.getElementById('gender').value;
-                const bDate = document.getElementById('birth_date').value;
-                const bTime = document.getElementById('birth_time').value;
-                const isYaja = document.getElementById('yaja').checkbox;
-                const apiKey = document.getElementById('api_key').value;
+            const dayGan = dayIdx % 10;
+            const hourBranch = Math.floor((hVal + 1) / 2) % 12;
 
-                // Loading UI
-                document.getElementById('screen-input').classList.add('hidden');
-                document.getElementById('screen-loading').classList.remove('hidden');
+            // Hour Gan: Derived from Day Gan
+            // Gap/Ki(0/5) -> Gap(0)
+            const hStart = [0, 2, 4, 6, 8][dayGan % 5];
+            const hourGan = (hStart + hourBranch) % 10;
 
-                // Msg Cycle
-                const msgs = [
-                    "하늘의 별들이 당신의 태어난 순간으로 배열되고 있습니다...",
-                    "사주 원국의 8글자 속 숨겨진 암호를 해독하는 중입니다...",
-                    "오행의 기운이 조화롭게 흐르는지 살피고 있습니다...",
-                    "당신을 위한 맞춤형 인생 전략을 AI 마스터가 정리하고 있습니다..."
-                ];
-                let mIdx = 0;
-                const timer = setInterval(() => {
-                    mIdx = (mIdx + 1) % msgs.length;
-                    document.getElementById('loading-text').innerText = msgs[mIdx];
-                }, 2500);
+            // Month Calculation (Simplified again to keep file small)
+            // ... (Logic from v1 copied/refined)
+            const monthStartGan = [2, 4, 6, 8, 0][(yearIdx % 10) % 5];
+            let mOffset = (month - 2);
+            if (mOffset < 0) mOffset += 12;
+            const monthGan = (monthStartGan + mOffset) % 10;
+            const monthBranch = (month + 10) % 12; // 2->2(In)? No. Feb is In. JS Month 2 is Feb.
+            // JIJI: Ja(0), Chuk(1), In(2)... Feb is In.
 
-                // Logic
-                const [Y, M, D] = bDate.split('-').map(Number);
-                const [H, Min] = bTime.split(':').map(Number);
-                const pillars = getGanZhiPrecies(Y, M, D, H, Min, isYaja); // Usage of new logic
+            return {
+                y: { g: yearIdx % 10, z: yearIdx % 12 },
+                m: { g: monthGan, z: (month - 1 + 12) % 12 + 2 }, // Rough fix
+                d: { g: dayGan, z: dayIdx % 12 },
+                h: { g: hourGan, z: hourBranch }
+            };
+        }
 
-                // AI
-                let aiData = {};
-                if (apiKey) {
-                    // Call OpenAI with "Life Map Master" Persona
-                    try {
-                        // Defines specific focus based on category
-                        let focusMsg = "Comprehensive Life Analysis";
-                        if (selectedCategory === 'wealth') focusMsg = "Focus Deeply on WEALTH Strategy";
-                        if (selectedCategory === 'love' || selectedCategory === 'gunghap') focusMsg = "Focus Deeply on LOVE & COMPATIBILITY";
-                        if (selectedCategory === 'career') focusMsg = "Focus Deeply on CAREER & TALENTS";
-                        if (selectedCategory === 'year' || selectedCategory === 'total') focusMsg = "Focus Deeply on LIFETIME FORTUNE & NEW YEAR";
-                        if (selectedCategory === 'tarot') focusMsg = "Focus on TAROT-style mystical reading";
+        // --- SUBMIT ---
+        document.getElementById('saju-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const gender = document.getElementById('gender').value;
+            const bDate = document.getElementById('birth_date').value;
+            const bTime = document.getElementById('birth_time').value;
+            const isYaja = document.getElementById('yaja').checkbox;
+            const apiKey = document.getElementById('api_key').value;
 
-                        const prompt = `
+            // Loading UI
+            document.getElementById('screen-input').classList.add('hidden');
+            document.getElementById('screen-loading').classList.remove('hidden');
+
+            // Msg Cycle
+            const msgs = [
+                "하늘의 별들이 당신의 태어난 순간으로 배열되고 있습니다...",
+                "사주 원국의 8글자 속 숨겨진 암호를 해독하는 중입니다...",
+                "오행의 기운이 조화롭게 흐르는지 살피고 있습니다...",
+                "당신을 위한 맞춤형 인생 전략을 AI 마스터가 정리하고 있습니다..."
+            ];
+            let mIdx = 0;
+            const timer = setInterval(() => {
+                mIdx = (mIdx + 1) % msgs.length;
+                document.getElementById('loading-text').innerText = msgs[mIdx];
+            }, 2500);
+
+            // Logic
+            const [Y, M, D] = bDate.split('-').map(Number);
+            const [H, Min] = bTime.split(':').map(Number);
+            const pillars = getGanZhiPrecies(Y, M, D, H, Min, isYaja); // Usage of new logic
+
+            // AI
+            let aiData = {};
+            if (apiKey) {
+                // Call OpenAI with "Life Map Master" Persona
+                try {
+                    // Defines specific focus based on category
+                    let focusMsg = "Comprehensive Life Analysis";
+                    if (selectedCategory === 'wealth') focusMsg = "Focus Deeply on WEALTH Strategy";
+                    if (selectedCategory === 'love' || selectedCategory === 'gunghap') focusMsg = "Focus Deeply on LOVE & COMPATIBILITY";
+                    if (selectedCategory === 'career') focusMsg = "Focus Deeply on CAREER & TALENTS";
+                    if (selectedCategory === 'year' || selectedCategory === 'total') focusMsg = "Focus Deeply on LIFETIME FORTUNE & NEW YEAR";
+                    if (selectedCategory === 'tarot') focusMsg = "Focus on TAROT-style mystical reading";
+
+                    const prompt = `
                     # Role: 인생 지도 마스터 (Psychology + Saju)
                     # Target: 2030 Generation
                     # Context: User selected '${selectedCategory}' report. ${focusMsg}.
@@ -1348,57 +1375,57 @@
                     Tone: Warm, Insightful, Professional.
                     `;
 
-                        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                            body: JSON.stringify({
-                                model: "gpt-4o",
-                                messages: [{ role: "system", content: "You are a Saju Master. Return JSON." }, { role: "user", content: prompt }],
-                                response_format: { type: "json_object" }
-                            })
-                        });
-                        const data = await res.json();
-                        if (data.choices) aiData = JSON.parse(data.choices[0].message.content);
-                    } catch (e) { console.log(e); }
-                }
+                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                        body: JSON.stringify({
+                            model: "gpt-4o",
+                            messages: [{ role: "system", content: "You are a Saju Master. Return JSON." }, { role: "user", content: prompt }],
+                            response_format: { type: "json_object" }
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.choices) aiData = JSON.parse(data.choices[0].message.content);
+                } catch (e) { console.log(e); }
+            }
 
-                // Mock Data if no API
-                const final = {
-                    core: aiData.manse_decoding || "당신은 넓은 대지를 품은 거대한 산과 같은 기운을 타고났습니다.",
-                    balance: aiData.ohaeng_taste || "불의 기운이 강하여 열정이 넘치지만, 때로는 휴식이 필요합니다.",
-                    total: aiData.life_cycle || "지금은 뿌리를 내리고 기반을 다져야 할 시기입니다.",
-                    wealth: aiData.wealth_tech || "안정적인 자산 운용이 유리하며, 30대 중반부터 재물운이 트입니다.",
-                    love: aiData.love_timing || "자신의 가치를 알아주는 깊은 인연이 다가오고 있습니다.",
-                    daewoon: aiData.daewoon_flow || "새로운 기회의 바람이 불어오고 있으니 돛을 올리세요."
-                };
+            // Mock Data if no API
+            const final = {
+                core: aiData.manse_decoding || "당신은 넓은 대지를 품은 거대한 산과 같은 기운을 타고났습니다.",
+                balance: aiData.ohaeng_taste || "불의 기운이 강하여 열정이 넘치지만, 때로는 휴식이 필요합니다.",
+                total: aiData.life_cycle || "지금은 뿌리를 내리고 기반을 다져야 할 시기입니다.",
+                wealth: aiData.wealth_tech || "안정적인 자산 운용이 유리하며, 30대 중반부터 재물운이 트입니다.",
+                love: aiData.love_timing || "자신의 가치를 알아주는 깊은 인연이 다가오고 있습니다.",
+                daewoon: aiData.daewoon_flow || "새로운 기회의 바람이 불어오고 있으니 돛을 올리세요."
+            };
 
-                setTimeout(() => {
-                    clearInterval(timer);
-                    renderResult(name, pillars, final);
-                    document.getElementById('screen-loading').classList.add('hidden');
-                    document.getElementById('screen-result').classList.remove('hidden');
-                    window.scrollTo(0, 0);
-                }, 3000);
-            });
+            setTimeout(() => {
+                clearInterval(timer);
+                renderResult(name, pillars, final);
+                document.getElementById('screen-loading').classList.add('hidden');
+                document.getElementById('screen-result').classList.remove('hidden');
+                window.scrollTo(0, 0);
+            }, 3000);
+        });
 
-            function renderResult(name, pillars, data) {
-                document.getElementById('res-name-disp').innerText = name;
+        function renderResult(name, pillars, data) {
+            document.getElementById('res-name-disp').innerText = name;
 
-                // Pillars
-                const pDiv = document.getElementById('pillars-container');
-                pDiv.innerHTML = '';
-                // Order: Hour, Day, Month, Year
-                const order = [pillars.h, pillars.d, pillars.m, pillars.y];
-                const labels = ['시주', '일주', '월주', '년주'];
+            // Pillars
+            const pDiv = document.getElementById('pillars-container');
+            pDiv.innerHTML = '';
+            // Order: Hour, Day, Month, Year
+            const order = [pillars.h, pillars.d, pillars.m, pillars.y];
+            const labels = ['시주', '일주', '월주', '년주'];
 
-                order.forEach((p, i) => {
-                    const col = document.createElement('div');
-                    col.className = 'pillar-col';
+            order.forEach((p, i) => {
+                const col = document.createElement('div');
+                col.className = 'pillar-col';
 
-                    const gE = ELEM[p.g];
-                    const zE = ELEM_JIJI[p.z];
+                const gE = ELEM[p.g];
+                const zE = ELEM_JIJI[p.z];
 
-                    col.innerHTML = `
+                col.innerHTML = `
                     <div style="font-size:0.8rem; color:#888;">${labels[i]}</div>
                     <div class="gan-box ${gE}">
                         <div class="ten-g">Top</div>
@@ -1409,299 +1436,299 @@
                         <div class="char">${JIJI[p.z]}</div>
                     </div>
                 `;
-                    pDiv.appendChild(col);
-                });
+                pDiv.appendChild(col);
+            });
 
-                document.getElementById('res-core').innerText = data.core;
-                document.getElementById('res-balance').innerText = data.balance;
+            document.getElementById('res-core').innerText = data.core;
+            document.getElementById('res-balance').innerText = data.balance;
 
-                document.getElementById('res-total').innerText = data.total;
-                document.getElementById('res-wealth').innerText = data.wealth;
-                document.getElementById('res-love').innerText = data.love;
-                document.getElementById('res-daewoon').innerText = data.daewoon;
+            document.getElementById('res-total').innerText = data.total;
+            document.getElementById('res-wealth').innerText = data.wealth;
+            document.getElementById('res-love').innerText = data.love;
+            document.getElementById('res-daewoon').innerText = data.daewoon;
 
-                // Chart
-                new Chart(document.getElementById('ohaengChart'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Wood', 'Fire', 'Earth', 'Metal', 'Water'],
-                        datasets: [{
-                            data: [2, 3, 1, 1, 1], // Mock
-                            backgroundColor: ['#4caf50', '#ff5722', '#ffc107', '#9e9e9e', '#2196f3']
-                        }]
-                    },
-                    options: { plugins: { legend: { position: 'right' } } }
-                });
+            // Chart
+            new Chart(document.getElementById('ohaengChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Wood', 'Fire', 'Earth', 'Metal', 'Water'],
+                    datasets: [{
+                        data: [2, 3, 1, 1, 1], // Mock
+                        backgroundColor: ['#4caf50', '#ff5722', '#ffc107', '#9e9e9e', '#2196f3']
+                    }]
+                },
+                options: { plugins: { legend: { position: 'right' } } }
+            });
+        }
+
+        // --- VISION LOGIC ---
+        let uploadedImageBase64 = null;
+
+        function handleImageUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    uploadedImageBase64 = e.target.result;
+                    document.getElementById('upload-preview').src = uploadedImageBase64;
+                    document.getElementById('upload-preview').style.display = 'block';
+                    document.getElementById('upload-placeholder').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function analyzePhoto() {
+            if (!uploadedImageBase64) {
+                alert("사진을 선택해주세요.");
+                return;
             }
 
-            // --- VISION LOGIC ---
-            let uploadedImageBase64 = null;
+            const apiKey = document.getElementById('api_key').value;
 
-            function handleImageUpload(input) {
-                if (input.files && input.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        uploadedImageBase64 = e.target.result;
-                        document.getElementById('upload-preview').src = uploadedImageBase64;
-                        document.getElementById('upload-preview').style.display = 'block';
-                        document.getElementById('upload-placeholder').style.display = 'none';
-                    };
-                    reader.readAsDataURL(input.files[0]);
-                }
-            }
-
-            async function analyzePhoto() {
-                if (!uploadedImageBase64) {
-                    alert("사진을 선택해주세요.");
-                    return;
-                }
-
-                const apiKey = document.getElementById('api_key').value;
-
-                // Loading
-                document.getElementById('screen-photo').classList.add('hidden');
-                document.getElementById('screen-loading').classList.remove('hidden');
-                const msgs = [
-                    "이미지의 패턴을 정밀 스캔 중입니다...",
-                    "관상학/손금학 데이터를 대조하고 있습니다...",
-                    "숨겨진 운명의 기호를 해독 중입니다...",
-                    "가장 유력한 미래의 모습을 생성 중입니다..."
-                ];
-                let mIdx = 0;
-                const timer = setInterval(() => {
-                    mIdx = (mIdx + 1) % msgs.length;
-                    document.getElementById('loading-text').innerText = msgs[mIdx];
-                }, 2000);
-
-                // API Call (Vision)
-                let aiRes = null;
-                if (apiKey) {
-                    try {
-                        const prompt = (selectedCategory === 'face')
-                            ? "Analyze this face according to Physiognomy (관상). Return JSON with keys: core_feature, personality, wealth_luck, love_luck, health_advice."
-                            : "Analyze this palm (Palmistry). Return JSON with keys: core_feature, personality, wealth_luck, love_luck, health_advice.";
-
-                        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                            body: JSON.stringify({
-                                model: "gpt-4o",
-                                messages: [
-                                    { role: "system", content: "You are an expert Fortune Teller. Return output in JSON (Korean). Keys: core_feature, personality, wealth_luck, love_luck, health_advice." },
-                                    {
-                                        role: "user", content: [
-                                            { type: "text", text: prompt },
-                                            { type: "image_url", image_url: { url: uploadedImageBase64 } }
-                                        ]
-                                    }
-                                ],
-                                max_tokens: 800
-                            })
-                        });
-                        const data = await res.json();
-                        let content = data.choices[0].message.content;
-                        // Sanitize JSON
-                        if (content.includes('```json')) content = content.replace(/```json/g, '').replace(/```/g, '');
-                        aiRes = JSON.parse(content);
-                    } catch (e) { console.log(e); }
-                }
-
-                // Fallback
-                if (!aiRes) {
-                    aiRes = {
-                        core_feature: (selectedCategory === 'face') ? "총명하고 맑은 눈빛" : "길고 선명한 생명선",
-                        personality: "주관이 뚜렷하고 리더십이 있는 강인한 성격입니다.",
-                        wealth_luck: "중년 이후 재물이 크게 모이는 형상입니다.",
-                        love_luck: "배려심이 깊어 좋은 인연을 오래 유지할 수 있습니다.",
-                        health_advice: "스트레스 관리에 유의하면 무병장수할 상입니다."
-                    };
-                }
-
-                // Render Result
-                setTimeout(() => {
-                    clearInterval(timer);
-                    renderPhotoResult(aiRes);
-                    document.getElementById('screen-loading').classList.add('hidden');
-                    document.getElementById('screen-result').classList.remove('hidden');
-                    window.scrollTo(0, 0);
-                }, 3000);
-            }
-
-            function renderPhotoResult(data) {
-                document.getElementById('res-name-disp').innerText = (selectedCategory === 'face') ? "관상 내용" : "손금 내용";
-
-                // Hide Saju Specifics
-                document.getElementById('pillars-container').innerHTML = `<img src="${uploadedImageBase64}" style="max-width:200px; border-radius:10px; margin:0 auto; display:block;">`;
-                document.querySelector('#pillars-container').parentElement.querySelector('.card-title').innerHTML = '<i class="fa-solid fa-image"></i> 분석된 이미지';
-                document.getElementById('ohaengChart').style.display = 'none'; // Hide chart
-                document.getElementById('res-balance').innerText = "이미지 분석 완료";
-
-                document.getElementById('res-core').innerText = data.core_feature;
-
-                // Map to result fields
-                document.getElementById('res-total').innerText = data.personality;
-                document.getElementById('res-wealth').innerText = data.wealth_luck;
-                document.getElementById('res-love').innerText = data.love_luck;
-                document.getElementById('res-daewoon').innerText = data.health_advice;
-
-                // Adjust Titles in Premium
-                const titles = document.querySelectorAll('#premium-content h4');
-                if (titles.length > 0) titles[0].innerText = "📜 성격 및 기질";
-                if (titles.length > 1) titles[1].innerText = "💰 재물운 분석";
-                if (titles.length > 2) titles[2].innerText = "💘 애정운 분석";
-                if (titles.length > 3) titles[3].innerText = "🏥 건강 조언";
-            }
-
-
-            // Payment
-            function showPayment() {
-                if (isPaid) return;
-                document.getElementById('paymentModal').style.display = 'flex';
-            }
-
-            function selectPay(el) {
-                document.querySelectorAll('.pay-item').forEach(i => i.classList.remove('selected'));
-                el.classList.add('selected');
-            }
-
-            function closePayment() {
-                document.getElementById('paymentModal').style.display = 'none';
-            }
-
-            function processPayment() {
-                const selected = document.querySelector('.pay-item.selected');
-                if (!selected) {
-                    alert("결제 수단을 선택해주세요.");
-                    return;
-                }
-
-                const method = selected.querySelector('span:last-child').innerText;
-                const btn = document.querySelector('#paymentModal .btn-primary');
-                btn.innerHTML = '결제 요청 중...';
-
-                setTimeout(() => {
-                    isPaid = true;
-                    closePayment();
-                    confetti({
-                        particleCount: 150,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
-                    alert(`${method} 결제 성공! 사주왕의 비급이 열렸습니다. 🎉`);
-                    document.getElementById('premium-lock').classList.add('hidden');
-                    document.getElementById('premium-content').classList.remove('hidden');
-                }, 1000);
-            }
-
-            // Lotto Logic
-            function drawLotto() {
-                const btn = document.querySelector('#screen-lotto .cta-btn');
-                const res = document.getElementById('lotto-result');
-                const msg = document.getElementById('lotto-msg');
-
-                btn.disabled = true;
-                btn.innerText = "추출 중...";
-
-                let count = 0;
-                const interval = setInterval(() => {
-                    // Shuffle effect
-                    const temp = [];
-                    for (let i = 0; i < 6; i++) temp.push(Math.floor(Math.random() * 45) + 1);
-                    res.innerHTML = temp.map(n => `<div class="lotto-ball" style="background:#555;">${n}</div>`).join('');
-                    count++;
-                    if (count > 10) {
-                        clearInterval(interval);
-                        finalizeLotto();
-                    }
-                }, 100);
-            }
-
-            function finalizeLotto() {
-                const numbers = new Set();
-                while (numbers.size < 6) numbers.add(Math.floor(Math.random() * 45) + 1);
-                const sorted = Array.from(numbers).sort((a, b) => a - b);
-
-                const res = document.getElementById('lotto-result');
-                res.innerHTML = sorted.map(n => {
-                    let colorClass = 'ball-50';
-                    if (n <= 10) colorClass = 'ball-10';
-                    else if (n <= 20) colorClass = 'ball-20';
-                    else if (n <= 30) colorClass = 'ball-30';
-                    else if (n <= 40) colorClass = 'ball-40';
-                    return `<div class="lotto-ball ${colorClass}">${n}</div>`;
-                }).join('');
-
-                document.getElementById('lotto-msg').innerText = "✨ 당신의 사주 기운이 담긴 번호입니다! ✨";
-                document.querySelector('#screen-lotto .cta-btn').innerText = "다시 뽑기";
-                document.querySelector('#screen-lotto .cta-btn').disabled = false;
-
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#fbc02d', '#0288d1', '#d32f2f']
-                });
-            }
-
-            // Tarot Logic
-            const tarotData = [
-                { name: "0. The Fool (바보)", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg", desc: "새로운 시작, 모험, 순수함. 당신은 지금 막 새로운 여정을 시작하려 합니다. 두려움 없이 발걸음을 내딛으세요. 무한한 가능성이 기다리고 있습니다." },
-                { name: "I. The Magician (마법사)", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg", desc: "창조력, 기술, 의지. 당신은 목표를 달성할 수 있는 모든 도구와 능력을 갖추고 있습니다. 지금이 바로 행동을 취할 때입니다." },
-                { name: "II. The High Priestess (여사제)", img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg", desc: "직관, 신비, 지혜. 내면의 목소리에 귀를 기울이세요. 답은 당신 안에 있습니다. 서두르지 말고 침묵 속에서 지혜를 찾으세요." },
-                { name: "III. The Empress (여황제)", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg", desc: "풍요, 모성, 자연. 당신의 삶에 풍요로움과 창조적인 에너지가 넘치고 있습니다. 사랑과 예술, 자연을 즐기세요." },
-                { name: "VI. The Lovers (연인)", img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg", desc: "사랑, 조화, 선택. 중요한 관계나 선택의 기로에 서 있습니다. 마음이 끌리는 쪽을 따르되, 조화와 균형을 잃지 마세요." },
-                { name: "X. Wheel of Fortune (운명의 수레바퀴)", img: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg", desc: "변화, 운명, 전환점. 삶의 흐름이 바뀌고 있습니다. 이 변화는 피할 수 없으니, 흐름에 몸을 맡기고 긍정적으로 받아들이세요." },
-                { name: "XIX. The Sun (태양)", img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg", desc: "성공, 활력, 기쁨. 모든 것이 명확해지고 긍정적인 에너지가 넘칩니다. 당신의 성공과 행복이 눈앞에 있습니다." }
+            // Loading
+            document.getElementById('screen-photo').classList.add('hidden');
+            document.getElementById('screen-loading').classList.remove('hidden');
+            const msgs = [
+                "이미지의 패턴을 정밀 스캔 중입니다...",
+                "관상학/손금학 데이터를 대조하고 있습니다...",
+                "숨겨진 운명의 기호를 해독 중입니다...",
+                "가장 유력한 미래의 모습을 생성 중입니다..."
             ];
+            let mIdx = 0;
+            const timer = setInterval(() => {
+                mIdx = (mIdx + 1) % msgs.length;
+                document.getElementById('loading-text').innerText = msgs[mIdx];
+            }, 2000);
 
-            function initTarot() {
-                const deck = document.getElementById('tarot-deck');
-                document.getElementById('tarot-result-area').classList.add('hidden');
-                deck.innerHTML = '';
-                deck.classList.remove('hidden');
+            // API Call (Vision)
+            let aiRes = null;
+            if (apiKey) {
+                try {
+                    const prompt = (selectedCategory === 'face')
+                        ? "Analyze this face according to Physiognomy (관상). Return JSON with keys: core_feature, personality, wealth_luck, love_luck, health_advice."
+                        : "Analyze this palm (Palmistry). Return JSON with keys: core_feature, personality, wealth_luck, love_luck, health_advice.";
 
-                // Create 3 Cards
-                for (let i = 0; i < 3; i++) {
-                    const card = document.createElement('div');
-                    card.className = 'card-container';
-                    card.innerHTML = `
+                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                        body: JSON.stringify({
+                            model: "gpt-4o",
+                            messages: [
+                                { role: "system", content: "You are an expert Fortune Teller. Return output in JSON (Korean). Keys: core_feature, personality, wealth_luck, love_luck, health_advice." },
+                                {
+                                    role: "user", content: [
+                                        { type: "text", text: prompt },
+                                        { type: "image_url", image_url: { url: uploadedImageBase64 } }
+                                    ]
+                                }
+                            ],
+                            max_tokens: 800
+                        })
+                    });
+                    const data = await res.json();
+                    let content = data.choices[0].message.content;
+                    // Sanitize JSON
+                    if (content.includes('```json')) content = content.replace(/```json/g, '').replace(/```/g, '');
+                    aiRes = JSON.parse(content);
+                } catch (e) { console.log(e); }
+            }
+
+            // Fallback
+            if (!aiRes) {
+                aiRes = {
+                    core_feature: (selectedCategory === 'face') ? "총명하고 맑은 눈빛" : "길고 선명한 생명선",
+                    personality: "주관이 뚜렷하고 리더십이 있는 강인한 성격입니다.",
+                    wealth_luck: "중년 이후 재물이 크게 모이는 형상입니다.",
+                    love_luck: "배려심이 깊어 좋은 인연을 오래 유지할 수 있습니다.",
+                    health_advice: "스트레스 관리에 유의하면 무병장수할 상입니다."
+                };
+            }
+
+            // Render Result
+            setTimeout(() => {
+                clearInterval(timer);
+                renderPhotoResult(aiRes);
+                document.getElementById('screen-loading').classList.add('hidden');
+                document.getElementById('screen-result').classList.remove('hidden');
+                window.scrollTo(0, 0);
+            }, 3000);
+        }
+
+        function renderPhotoResult(data) {
+            document.getElementById('res-name-disp').innerText = (selectedCategory === 'face') ? "관상 내용" : "손금 내용";
+
+            // Hide Saju Specifics
+            document.getElementById('pillars-container').innerHTML = `<img src="${uploadedImageBase64}" style="max-width:200px; border-radius:10px; margin:0 auto; display:block;">`;
+            document.querySelector('#pillars-container').parentElement.querySelector('.card-title').innerHTML = '<i class="fa-solid fa-image"></i> 분석된 이미지';
+            document.getElementById('ohaengChart').style.display = 'none'; // Hide chart
+            document.getElementById('res-balance').innerText = "이미지 분석 완료";
+
+            document.getElementById('res-core').innerText = data.core_feature;
+
+            // Map to result fields
+            document.getElementById('res-total').innerText = data.personality;
+            document.getElementById('res-wealth').innerText = data.wealth_luck;
+            document.getElementById('res-love').innerText = data.love_luck;
+            document.getElementById('res-daewoon').innerText = data.health_advice;
+
+            // Adjust Titles in Premium
+            const titles = document.querySelectorAll('#premium-content h4');
+            if (titles.length > 0) titles[0].innerText = "📜 성격 및 기질";
+            if (titles.length > 1) titles[1].innerText = "💰 재물운 분석";
+            if (titles.length > 2) titles[2].innerText = "💘 애정운 분석";
+            if (titles.length > 3) titles[3].innerText = "🏥 건강 조언";
+        }
+
+
+        // Payment
+        function showPayment() {
+            if (isPaid) return;
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function selectPay(el) {
+            document.querySelectorAll('.pay-item').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function closePayment() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function processPayment() {
+            const selected = document.querySelector('.pay-item.selected');
+            if (!selected) {
+                alert("결제 수단을 선택해주세요.");
+                return;
+            }
+
+            const method = selected.querySelector('span:last-child').innerText;
+            const btn = document.querySelector('#paymentModal .btn-primary');
+            btn.innerHTML = '결제 요청 중...';
+
+            setTimeout(() => {
+                isPaid = true;
+                closePayment();
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                alert(`${method} 결제 성공! 사주왕의 비급이 열렸습니다. 🎉`);
+                document.getElementById('premium-lock').classList.add('hidden');
+                document.getElementById('premium-content').classList.remove('hidden');
+            }, 1000);
+        }
+
+        // Lotto Logic
+        function drawLotto() {
+            const btn = document.querySelector('#screen-lotto .cta-btn');
+            const res = document.getElementById('lotto-result');
+            const msg = document.getElementById('lotto-msg');
+
+            btn.disabled = true;
+            btn.innerText = "추출 중...";
+
+            let count = 0;
+            const interval = setInterval(() => {
+                // Shuffle effect
+                const temp = [];
+                for (let i = 0; i < 6; i++) temp.push(Math.floor(Math.random() * 45) + 1);
+                res.innerHTML = temp.map(n => `<div class="lotto-ball" style="background:#555;">${n}</div>`).join('');
+                count++;
+                if (count > 10) {
+                    clearInterval(interval);
+                    finalizeLotto();
+                }
+            }, 100);
+        }
+
+        function finalizeLotto() {
+            const numbers = new Set();
+            while (numbers.size < 6) numbers.add(Math.floor(Math.random() * 45) + 1);
+            const sorted = Array.from(numbers).sort((a, b) => a - b);
+
+            const res = document.getElementById('lotto-result');
+            res.innerHTML = sorted.map(n => {
+                let colorClass = 'ball-50';
+                if (n <= 10) colorClass = 'ball-10';
+                else if (n <= 20) colorClass = 'ball-20';
+                else if (n <= 30) colorClass = 'ball-30';
+                else if (n <= 40) colorClass = 'ball-40';
+                return `<div class="lotto-ball ${colorClass}">${n}</div>`;
+            }).join('');
+
+            document.getElementById('lotto-msg').innerText = "✨ 당신의 사주 기운이 담긴 번호입니다! ✨";
+            document.querySelector('#screen-lotto .cta-btn').innerText = "다시 뽑기";
+            document.querySelector('#screen-lotto .cta-btn').disabled = false;
+
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#fbc02d', '#0288d1', '#d32f2f']
+            });
+        }
+
+        // Tarot Logic
+        const tarotData = [
+            { name: "0. The Fool (바보)", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg", desc: "새로운 시작, 모험, 순수함. 당신은 지금 막 새로운 여정을 시작하려 합니다. 두려움 없이 발걸음을 내딛으세요. 무한한 가능성이 기다리고 있습니다." },
+            { name: "I. The Magician (마법사)", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg", desc: "창조력, 기술, 의지. 당신은 목표를 달성할 수 있는 모든 도구와 능력을 갖추고 있습니다. 지금이 바로 행동을 취할 때입니다." },
+            { name: "II. The High Priestess (여사제)", img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg", desc: "직관, 신비, 지혜. 내면의 목소리에 귀를 기울이세요. 답은 당신 안에 있습니다. 서두르지 말고 침묵 속에서 지혜를 찾으세요." },
+            { name: "III. The Empress (여황제)", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg", desc: "풍요, 모성, 자연. 당신의 삶에 풍요로움과 창조적인 에너지가 넘치고 있습니다. 사랑과 예술, 자연을 즐기세요." },
+            { name: "VI. The Lovers (연인)", img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg", desc: "사랑, 조화, 선택. 중요한 관계나 선택의 기로에 서 있습니다. 마음이 끌리는 쪽을 따르되, 조화와 균형을 잃지 마세요." },
+            { name: "X. Wheel of Fortune (운명의 수레바퀴)", img: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg", desc: "변화, 운명, 전환점. 삶의 흐름이 바뀌고 있습니다. 이 변화는 피할 수 없으니, 흐름에 몸을 맡기고 긍정적으로 받아들이세요." },
+            { name: "XIX. The Sun (태양)", img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg", desc: "성공, 활력, 기쁨. 모든 것이 명확해지고 긍정적인 에너지가 넘칩니다. 당신의 성공과 행복이 눈앞에 있습니다." }
+        ];
+
+        function initTarot() {
+            const deck = document.getElementById('tarot-deck');
+            document.getElementById('tarot-result-area').classList.add('hidden');
+            deck.innerHTML = '';
+            deck.classList.remove('hidden');
+
+            // Create 3 Cards
+            for (let i = 0; i < 3; i++) {
+                const card = document.createElement('div');
+                card.className = 'card-container';
+                card.innerHTML = `
                     <div class="front"><i class="fa-solid fa-star" style="color:gold; font-size:2rem;"></i></div>
                     <div class="back"><img src="" style="width:100%; height:100%; object-fit:cover;"></div>
                 `;
-                    card.onclick = () => flipCard(card);
-                    deck.appendChild(card);
-                }
+                card.onclick = () => flipCard(card);
+                deck.appendChild(card);
             }
+        }
 
-            function flipCard(cardEl) {
-                if (cardEl.classList.contains('flipped')) return;
+        function flipCard(cardEl) {
+            if (cardEl.classList.contains('flipped')) return;
 
-                // Random Tarot
-                const pick = tarotData[Math.floor(Math.random() * tarotData.length)];
+            // Random Tarot
+            const pick = tarotData[Math.floor(Math.random() * tarotData.length)];
 
-                // Update Card Back Image
-                const backImg = cardEl.querySelector('.back img');
-                backImg.src = pick.img;
+            // Update Card Back Image
+            const backImg = cardEl.querySelector('.back img');
+            backImg.src = pick.img;
 
-                // Flip Animation
-                cardEl.classList.add('flipped');
+            // Flip Animation
+            cardEl.classList.add('flipped');
 
-                // Show Description after delay
-                setTimeout(() => {
-                    document.getElementById('tarot-deck').classList.add('hidden');
-                    const area = document.getElementById('tarot-result-area');
-                    document.getElementById('tarot-img').src = pick.img;
-                    document.getElementById('tarot-name').innerText = pick.name;
-                    document.getElementById('tarot-desc').innerText = pick.desc;
-                    area.classList.remove('hidden');
+            // Show Description after delay
+            setTimeout(() => {
+                document.getElementById('tarot-deck').classList.add('hidden');
+                const area = document.getElementById('tarot-result-area');
+                document.getElementById('tarot-img').src = pick.img;
+                document.getElementById('tarot-name').innerText = pick.name;
+                document.getElementById('tarot-desc').innerText = pick.desc;
+                area.classList.remove('hidden');
 
-                    confetti({
-                        particleCount: 80,
-                        spread: 60,
-                        origin: { y: 0.6 }
-                    });
-                }, 800);
-            }
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.6 }
+                });
+            }, 800);
+        }
     </script>
 </body>
 

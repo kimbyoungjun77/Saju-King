@@ -4,25 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>사주왕 (sasuking) - "사주 보기 전 vs 후, 인생이 달라집니다"</title>
+    <title>사주왕 (Saju King) - 운명의 반전</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            /* Forceteller-inspired Palette */
-            --bg-color: #f5f0e1;
-            /* Warm Cream */
-            --primary: #6b4c9a;
-            /* Deep Purple */
-            --secondary: #e6b2ba;
-            /* Soft Pink */
-            --accent: #ffb74d;
-            /* Golden Orange */
-            --dark: #2d2a4a;
-            --text-main: #333333;
-            --white-glass: rgba(255, 255, 255, 0.9);
-            --shadow: 0 4px 20px rgba(107, 76, 154, 0.15);
+            /* Saju King Palette */
+            --bg-color: #fdfbf7;
+            --primary: #5d3fd3;
+            /* Royal Purple */
+            --secondary: #ffd700;
+            /* Gold */
+            --accent: #ff4081;
+            /* Vivacious Pink */
+            --dark: #1a1a2e;
+            --text-main: #333;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         }
 
         body,
@@ -34,6 +33,42 @@
             color: var(--text-main);
             min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* Fun Animations */
+        @keyframes bounce-sm {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .bounce {
+            animation: bounce-sm 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 64, 129, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 64, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 64, 129, 0);
+            }
+        }
+
+        .glow-btn {
+            animation: pulse-glow 2s infinite;
         }
 
         /* Utils */
@@ -420,74 +455,236 @@
         .water {
             background: #2196f3;
         }
+
+        /* Motto Card */
+        .lotto-ball {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            line-height: 40px;
+            text-align: center;
+            margin: 0 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 1.1rem;
+        }
+
+        .ball-10 {
+            background: #fbc02d;
+        }
+
+        .ball-20 {
+            background: #0288d1;
+        }
+
+        .ball-30 {
+            background: #d32f2f;
+        }
+
+        .ball-40 {
+            background: #333;
+        }
+
+        .ball-50 {
+            background: #388e3c;
+        }
+
+        /* Social Login */
+        .social-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Payment Grid */
+        .pay-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .pay-item {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .pay-item:hover,
+        .pay-item.selected {
+            border-color: var(--primary);
+            background: rgba(93, 63, 211, 0.05);
+        }
+
+        .pay-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
     </style>
 </head>
 
 <body>
 
+    <!-- SCREEN: LOGIN (Start Screen) -->
+    <div id="screen-login" class="container fade-in"
+        style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; background: linear-gradient(135deg, var(--primary), #8e44ad);">
+        <div style="text-align:center; color:white; margin-bottom:3rem;">
+            <i class="fa-solid fa-crown bounce" style="font-size:4rem; color:#ffd700; margin-bottom:1rem;"></i>
+            <h1 style="font-size:2rem; margin:0;">사주왕</h1>
+            <p style="opacity:0.8;">Saju King</p>
+        </div>
+
+        <div style="width:100%; max-width:300px; display:flex; flex-direction:column; gap:10px;">
+            <button class="social-btn" onclick="login('kakao')" style="background:#fee500; color:#3c1e1e;">
+                <i class="fa-solid fa-comment" style="margin-right:10px;"></i> 카카오로 시작하기
+            </button>
+            <button class="social-btn" onclick="login('naver')" style="background:#03c75a; color:white;">
+                <span style="font-weight:900; margin-right:10px;">N</span> 네이버로 시작하기
+            </button>
+            <button class="social-btn" onclick="login('google')"
+                style="background:white; color:#333; border:1px solid #ddd;">
+                <i class="fa-brands fa-google" style="margin-right:10px; color:#ea4335;"></i> 구글로 시작하기
+            </button>
+            <button class="social-btn" onclick="login('apple')" style="background:black; color:white;">
+                <i class="fa-brands fa-apple" style="margin-right:10px;"></i> Apple로 계속하기
+            </button>
+            <button class="social-btn" onclick="login('facebook')" style="background:#1877f2; color:white;">
+                <i class="fa-brands fa-facebook" style="margin-right:10px;"></i> 페이스북으로 시작하기
+            </button>
+        </div>
+
+        <p style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-top:2rem;">
+            로그인하면 개인정보처리방침 및 이용약관에 동의하게 됩니다.
+        </p>
+    </div>
+
+    <!-- Payment Modal (Select Gateway) -->
+    <div id="paymentModal" class="payment-modal">
+        <div class="payment-content">
+            <h3 style="margin-top:0;">결제 수단 선택</h3>
+            <p style="color:#666; font-size:0.9rem;">할인가 <strong>990원</strong> (부가세 포함)</p>
+
+            <div class="pay-grid">
+                <div class="pay-item" onclick="selectPay(this)">
+                    <span class="pay-icon" style="color:#03c75a;"><i class="fa-solid fa-n"></i></span>
+                    <span style="font-size:0.8rem;">네이버페이</span>
+                </div>
+                <div class="pay-item" onclick="selectPay(this)">
+                    <span class="pay-icon" style="color:#3182f6;"><i class="fa-solid fa-money-bill-wave"></i></span>
+                    <span style="font-size:0.8rem;">토스페이</span>
+                </div>
+                <div class="pay-item" onclick="selectPay(this)">
+                    <span class="pay-icon" style="color:#fee500;"><i class="fa-solid fa-comment-dollar"></i></span>
+                    <span style="font-size:0.8rem;">카카오페이</span>
+                </div>
+                <div class="pay-item" onclick="selectPay(this)">
+                    <span class="pay-icon" style="color:#ea4335;"><i class="fa-brands fa-google-pay"></i></span>
+                    <span style="font-size:0.8rem;">구글페이</span>
+                </div>
+                <div class="pay-item" onclick="selectPay(this)">
+                    <span class="pay-icon" style="color:#333;"><i class="fa-brands fa-apple-pay"></i></span>
+                    <span style="font-size:0.8rem;">Apple Pay</span>
+                </div>
+                <div class="pay-item" onclick="selectPay(this)">
+                    <span class="pay-icon" style="color:#1a1a2e;"><i class="fa-brands fa-cc-visa"></i></span>
+                    <span style="font-size:0.8rem;">신용카드</span>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="processPayment()">결제하기</button>
+            <button
+                style="background:none; border:none; color:#888; text-decoration:underline; margin-top:1rem; cursor:pointer;"
+                onclick="closePayment()">취소</button>
+        </div>
+    </div>
+
     <!-- SCREEN: HOME -->
-    <div id="screen-home" class="container fade-in">
+    <div id="screen-home" class="container hidden">
         <header class="app-header">
-            <div class="logo"><i class="fa-solid fa-star"></i> 별하(Byeolha)</div>
-            <i class="fa-solid fa-bars" style="color:var(--text-main);"></i>
+            <div class="logo"><i class="fa-solid fa-crown bounce" style="color:gold;"></i> 사주왕</div>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <div id="user-profile" style="font-size:0.9rem; color:var(--primary); font-weight:bold;"></div>
+                <i class="fa-solid fa-bars" style="color:var(--text-main);"></i>
+            </div>
         </header>
 
         <section class="main-banner">
-            <h1>내 운명의 지도, 별하</h1>
-            <p>2030을 위한 트렌디한 AI 명리 분석</p>
+            <h1 class="bounce" style="animation-delay:0.1s;">👑 당신의 운명을 지배하세요</h1>
+            <p>2030 압도적 1위! AI 사주 놀이터</p>
         </section>
 
-        <!-- Category Grid (Benchmarked) -->
-        <h3 style="padding:0 1.5rem; margin-bottom:1rem;">어떤 운세가 궁금한가요?</h3>
+        <!-- Category Grid (Reorganized) -->
+        <h3 style="padding:0 1.5rem; margin-bottom:1rem; display:flex; align-items:center;">
+            <i class="fa-solid fa-fire" style="color:red; margin-right:5px;"></i> 인기 컨텐츠
+        </h3>
         <div class="category-grid">
             <div class="cat-item" onclick="openInput('total')">
                 <div class="cat-icon" style="position:relative;">
                     <i class="fa-solid fa-scroll"></i>
-                    <div class="tag-new">NEW</div>
+                    <div class="tag-new">BEST</div>
                 </div>
-                <span class="cat-label">정통사주</span>
-            </div>
-            <div class="cat-item" onclick="openInput('wealth')">
-                <div class="cat-icon"><i class="fa-solid fa-coins"></i></div>
-                <span class="cat-label">재물운</span>
-            </div>
-            <div class="cat-item" onclick="openInput('love')">
-                <div class="cat-icon"><i class="fa-solid fa-heart"></i></div>
-                <span class="cat-label">애정운</span>
-            </div>
-            <div class="cat-item" onclick="openInput('career')">
-                <div class="cat-icon"><i class="fa-solid fa-briefcase"></i></div>
-                <span class="cat-label">직업운</span>
-            </div>
-
-            <!-- Row 2 -->
-            <div class="cat-item" onclick="openInput('today')">
-                <div class="cat-icon"><i class="fa-regular fa-calendar-check"></i></div>
-                <span class="cat-label">오늘운세</span>
-            </div>
-            <div class="cat-item" onclick="openInput('tarot')">
-                <div class="cat-icon"><i class="fa-solid fa-moon"></i></div>
-                <span class="cat-label">타로</span>
-            </div>
-            <div class="cat-item" onclick="openInput('star')">
-                <div class="cat-icon"><i class="fa-solid fa-star"></i></div>
-                <span class="cat-label">별자리</span>
+                <span class="cat-label">평생운세</span>
             </div>
             <div class="cat-item" onclick="openInput('year')">
                 <div class="cat-icon"><i class="fa-solid fa-seedling"></i></div>
                 <span class="cat-label">신년운세</span>
             </div>
+            <div class="cat-item" onclick="openInput('gunghap')">
+                <div class="cat-icon"><i class="fa-solid fa-heart-pulse" style="color:#ff4081;"></i></div>
+                <span class="cat-label">궁합</span>
+            </div>
+            <div class="cat-item" onclick="openInput('tarot')">
+                <div class="cat-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <span class="cat-label">타로</span>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="cat-item" onclick="openInput('wealth')">
+                <div class="cat-icon"><i class="fa-solid fa-sack-dollar" style="color:gold;"></i></div>
+                <span class="cat-label">재물운</span>
+            </div>
+            <div class="cat-item" onclick="openInput('lotto')">
+                <div class="cat-icon glow-btn"><i class="fa-solid fa-ticket" style="color:#4caf50;"></i></div>
+                <span class="cat-label">로또추첨</span>
+            </div>
+            <div class="cat-item" onclick="openInput('star')">
+                <div class="cat-icon"><i class="fa-solid fa-star"></i></div>
+                <span class="cat-label">별자리</span>
+            </div>
+            <div class="cat-item" onclick="openInput('today')">
+                <div class="cat-icon"><i class="fa-regular fa-calendar-check"></i></div>
+                <span class="cat-label">오늘운세</span>
+            </div>
         </div>
 
         <div style="padding: 1.5rem;">
             <div
-                style="background: #f8f9fa; border-radius: 15px; padding: 1rem; display: flex; align-items: center; gap: 1rem;">
-                <div
-                    style="background: var(--primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
-                    AI</div>
+                style="background: white; border-radius: 15px; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; box-shadow:var(--shadow);">
+                <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" style="width:50px; height:50px;"
+                    class="bounce">
                 <div>
-                    <strong style="display:block; font-size:0.9rem;">AI 명리 마스터의 한마디</strong>
-                    <span style="font-size:0.8rem; color:#666;">"운명은 정해진 것이 아니라 주어지는 재료입니다."</span>
+                    <strong style="display:block; font-size:1rem; margin-bottom:0.2rem;">사주왕 AI의 조언</strong>
+                    <span style="font-size:0.85rem; color:#666;">"행운은 준비된 자에게 찾아옵니다. 🍀"</span>
                 </div>
             </div>
         </div>
@@ -536,8 +733,11 @@
                     </div>
 
                     <div class="input-group">
-                        <label class="input-label">OpenAI Key (Optional)</label>
-                        <input type="password" id="api_key" class="styled-input" placeholder="AI 정밀 분석을 원하시면 입력하세요.">
+                        <label class="input-label">OpenAI Key (자동 적용됨)</label>
+                        <input type="password" id="api_key" class="styled-input"
+                            value="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"
+                            readonly style="background:#f0f0f0; color:#888;">
+                        <p style="font-size:0.75rem; color:#888; margin-top:5px;">* 사주왕 공식 API 키가 적용되어 있습니다.</p>
                     </div>
 
                     <button type="submit" class="cta-btn">결과 확인하기</button>
@@ -546,13 +746,35 @@
         </div>
     </div>
 
+    <!-- SCREEN: LOTTO (Popup) -->
+    <div id="screen-lotto" class="container hidden" style="background:#1a1a2e; color:white; text-align:center;">
+        <header class="app-header" style="background:transparent; border:none; color:white;">
+            <div class="logo" onclick="goHome()" style="cursor:pointer; color:white;"><i
+                    class="fa-solid fa-arrow-left"></i> 나가기</div>
+        </header>
+        <div
+            style="padding: 2rem; display:flex; flex-direction:column; align-items:center; justify-content:center; height:80vh;">
+            <h1 style="color:#ffd700; margin-bottom:0.5rem;">🎰 사주왕 로또</h1>
+            <p style="color:#aaa; margin-bottom:2rem;">당신의 운세 에너지를 모아 추출합니다.</p>
+
+            <div id="lotto-result" style="display:flex; gap:10px; margin-bottom:2rem; min-height:50px;">
+                <!-- Balls go here -->
+                <div style="font-size:2rem; color:#555;">? ? ? ? ? ?</div>
+            </div>
+
+            <button class="cta-btn glow-btn" onclick="drawLotto()" style="background:#ff4081; max-width:200px;">번호
+                추출하기</button>
+            <p id="lotto-msg" style="margin-top:1rem; color:#ffd700; min-height:1.5em;"></p>
+        </div>
+    </div>
+
     <!-- SCREEN: LOADING -->
     <div id="screen-loading" class="loading-screen hidden">
         <div
             style="width: 80px; height: 80px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 2rem;">
         </div>
-        <h2 style="margin:0;">운명을 분석 중입니다</h2>
-        <div id="loading-text" class="message-box">하늘의 별들이 정렬하고 있습니다...</div>
+        <h2 style="margin:0; color:#ffd700;">사주왕 AI 분석중</h2>
+        <div id="loading-text" class="message-box">천기누설 비밀 데이터를 열람합니다...</div>
     </div>
 
     <!-- SCREEN: RESULT -->
@@ -584,15 +806,16 @@
         </div>
 
         <!-- 4. Premium Cards (Locked) -->
-        <div class="result-card premium-section">
-            <div class="card-title" style="color:var(--accent);"><i class="fa-solid fa-gem"></i> 프리미엄 심층 분석</div>
+        <div class="result-card premium-section" style="border: 2px solid var(--secondary);">
+            <div class="card-title" style="color:var(--primary);"><i class="fa-solid fa-crown"
+                    style="color:#ffd700;"></i> 사주왕 프리미엄 비급</div>
 
             <div id="premium-lock" class="premium-blur">
                 <div class="lock-overlay">
-                    <button class="unlock-btn" onclick="showPayment()">
-                        <i class="fa-solid fa-lock-open"></i> 전체 결과 열람 (₩ 3,900)
+                    <button class="unlock-btn glow-btn" onclick="showPayment()">
+                        <i class="fa-solid fa-lock-open"></i> 990원에 확인하기 (특가)
                     </button>
-                    <p style="font-size:0.8rem; color:#666; margin-top:0.5rem;">평생 총평, 재물, 애정, 대운 흐름 포함</p>
+                    <p style="font-size:0.8rem; color:#666; margin-top:0.5rem;">🔥 95% 할인 중! 곧 종료됩니다.</p>
                 </div>
                 <div style="filter: blur(4px); opacity: 0.5;">
                     <p>여기에는 당신의 인생을 바꿀 중요한 조언이 담겨 있습니다. 대운의 흐름과 재물운을 분석하여...</p>
@@ -634,10 +857,37 @@
         const ELEM_JIJI = ['water', 'earth', 'wood', 'wood', 'earth', 'fire', 'fire', 'earth', 'metal', 'metal', 'earth', 'water'];
 
         let selectedCategory = 'total';
+        let currentUser = null;
+
+        // --- AUTH ---
+        function login(provider) {
+            // Simulate Login
+            const msgs = {
+                'kakao': '카카오 로그인 성공! 환영합니다.',
+                'naver': '네이버 아이디로 연결되었습니다.',
+                'google': 'Google 계정 확인 완료.',
+                'apple': 'Apple ID로 로그인되었습니다.',
+                'facebook': '페이스북 연결 완료.'
+            };
+            alert(msgs[provider] || "로그인 성공");
+            currentUser = "Guest";
+            if (provider === 'kakao') currentUser = "김kakao";
+            if (provider === 'naver') currentUser = "이naver";
+
+            document.getElementById('user-profile').innerHTML = `<i class="fa-solid fa-user"></i> ${currentUser}님`;
+
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-home').classList.remove('hidden');
+        }
 
         // --- NAVIGATION ---
         function openInput(cat) {
             selectedCategory = cat;
+            if (cat === 'lotto') {
+                document.getElementById('screen-home').classList.add('hidden');
+                document.getElementById('screen-lotto').classList.remove('hidden');
+                return;
+            }
             document.getElementById('screen-home').classList.add('hidden');
             document.getElementById('screen-input').classList.remove('hidden');
             window.scrollTo(0, 0);
@@ -646,6 +896,7 @@
         function goHome() {
             document.getElementById('screen-result').classList.add('hidden');
             document.getElementById('screen-input').classList.add('hidden');
+            document.getElementById('screen-lotto').classList.add('hidden');
             document.getElementById('screen-home').classList.remove('hidden');
         }
 
@@ -723,7 +974,7 @@
             let mOffset = (month - 2);
             if (mOffset < 0) mOffset += 12;
             const monthGan = (monthStartGan + mOffset) % 10;
-            const monthBranch = (month + 10) % 12; // 2->2(In)? No. Feb=In(2). JS Month 2 is Feb.
+            const monthBranch = (month + 10) % 12; // 2->2(In)? No. Feb is In. JS Month 2 is Feb.
             // JIJI: Ja(0), Chuk(1), In(2)... Feb is In.
 
             return {
@@ -774,9 +1025,10 @@
                     // Defines specific focus based on category
                     let focusMsg = "Comprehensive Life Analysis";
                     if (selectedCategory === 'wealth') focusMsg = "Focus Deeply on WEALTH Strategy";
-                    if (selectedCategory === 'love') focusMsg = "Focus Deeply on LOVE & RELATIONSHIPS";
+                    if (selectedCategory === 'love' || selectedCategory === 'gunghap') focusMsg = "Focus Deeply on LOVE & COMPATIBILITY";
                     if (selectedCategory === 'career') focusMsg = "Focus Deeply on CAREER & TALENTS";
-                    if (selectedCategory === 'year') focusMsg = "Focus Deeply on 2024-2025 YEARLY FORTUNE";
+                    if (selectedCategory === 'year' || selectedCategory === 'total') focusMsg = "Focus Deeply on LIFETIME FORTUNE & NEW YEAR";
+                    if (selectedCategory === 'tarot') focusMsg = "Focus on TAROT-style mystical reading";
 
                     const prompt = `
                     # Role: 인생 지도 마스터 (Psychology + Saju)
@@ -884,14 +1136,94 @@
 
         // Payment
         function showPayment() {
-            if (confirm("3,900원을 결제하시겠습니까? (Simulated)")) {
-                alert("결제 완료! 프리미엄 리포트가 해제되었습니다.");
+            if (isPaid) return;
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function selectPay(el) {
+            document.querySelectorAll('.pay-item').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function closePayment() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function processPayment() {
+            const selected = document.querySelector('.pay-item.selected');
+            if (!selected) {
+                alert("결제 수단을 선택해주세요.");
+                return;
+            }
+
+            const method = selected.querySelector('span:last-child').innerText;
+            const btn = document.querySelector('#paymentModal .btn-primary');
+            btn.innerHTML = '결제 요청 중...';
+
+            setTimeout(() => {
+                isPaid = true;
+                closePayment();
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                alert(`${method} 결제 성공! 사주왕의 비급이 열렸습니다. 🎉`);
                 document.getElementById('premium-lock').classList.add('hidden');
                 document.getElementById('premium-content').classList.remove('hidden');
-            }
+            }, 1000);
+        }
+
+        // Lotto Logic
+        function drawLotto() {
+            const btn = document.querySelector('#screen-lotto .cta-btn');
+            const res = document.getElementById('lotto-result');
+            const msg = document.getElementById('lotto-msg');
+
+            btn.disabled = true;
+            btn.innerText = "추출 중...";
+
+            let count = 0;
+            const interval = setInterval(() => {
+                // Shuffle effect
+                const temp = [];
+                for (let i = 0; i < 6; i++) temp.push(Math.floor(Math.random() * 45) + 1);
+                res.innerHTML = temp.map(n => `<div class="lotto-ball" style="background:#555;">${n}</div>`).join('');
+                count++;
+                if (count > 10) {
+                    clearInterval(interval);
+                    finalizeLotto();
+                }
+            }, 100);
+        }
+
+        function finalizeLotto() {
+            const numbers = new Set();
+            while (numbers.size < 6) numbers.add(Math.floor(Math.random() * 45) + 1);
+            const sorted = Array.from(numbers).sort((a, b) => a - b);
+
+            const res = document.getElementById('lotto-result');
+            res.innerHTML = sorted.map(n => {
+                let colorClass = 'ball-50';
+                if (n <= 10) colorClass = 'ball-10';
+                else if (n <= 20) colorClass = 'ball-20';
+                else if (n <= 30) colorClass = 'ball-30';
+                else if (n <= 40) colorClass = 'ball-40';
+                return `<div class="lotto-ball ${colorClass}">${n}</div>`;
+            }).join('');
+
+            document.getElementById('lotto-msg').innerText = "✨ 당신의 사주 기운이 담긴 번호입니다! ✨";
+            document.querySelector('#screen-lotto .cta-btn').innerText = "다시 뽑기";
+            document.querySelector('#screen-lotto .cta-btn').disabled = false;
+
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#fbc02d', '#0288d1', '#d32f2f']
+            });
         }
     </script>
 </body>
 
 </html>
-

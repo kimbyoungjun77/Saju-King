@@ -512,6 +512,94 @@
             transform: scale(0.98);
         }
 
+        /* Image Grid (User Request) */
+        .image-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 0 1.5rem 2rem 1.5rem;
+        }
+
+        .img-card {
+            width: 100%;
+            height: 120px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .img-card:active {
+            transform: scale(0.98);
+        }
+
+        .img-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .img-card .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Tarot Card Flip */
+        .tarot-stage {
+            perspective: 1000px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+
+        .card-container {
+            width: 100px;
+            height: 160px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+
+        .card-container.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .front,
+        .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .front {
+            background: #1a1a2e;
+            border: 2px solid gold;
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+        }
+
+        .back {
+            background: white;
+            transform: rotateY(180deg);
+            overflow: hidden;
+        }
+
         /* Payment Grid */
         .pay-grid {
             display: grid;
@@ -540,18 +628,99 @@
             margin-bottom: 0.5rem;
             display: block;
         }
+
+        /* Splash Animations */
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- SCREEN: LOGIN (Start Screen) -->
-    <div id="screen-login" class="container fade-in"
-        style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; background: linear-gradient(135deg, var(--primary), #8e44ad);">
+    <!-- SCREEN: SPLASH (Title) -->
+    <div id="screen-splash" class="container fade-in" onclick="goToLogin()"
+        style="cursor:pointer; background: linear-gradient(135deg, #1a1a2e, #4a148c); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;">
+        <!-- Stars Background -->
+        <div class="stars">
+            <div class="star" style="width:2px; height:2px; top:10%; left:20%; animation-delay:0.1s;"></div>
+            <div class="star" style="width:3px; height:3px; top:30%; left:80%; animation-delay:0.5s;"></div>
+            <div class="star" style="width:2px; height:2px; top:70%; left:10%; animation-delay:1.2s;"></div>
+            <div class="star" style="width:4px; height:4px; top:50%; left:50%; animation-delay:0.8s;"></div>
+            <div class="star" style="width:2px; height:2px; top:20%; left:90%; animation-delay:1.5s;"></div>
+            <div class="star" style="width:3px; height:3px; top:85%; left:75%; animation-delay:0.3s;"></div>
+        </div>
+
+        <div class="floating" style="text-align:center; margin-bottom:3rem;">
+            <i class="fa-solid fa-crown"
+                style="font-size:5rem; color:#ffd700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);"></i>
+            <h1 style="font-size:3rem; margin:1rem 0 0 0; color:white; font-family:'Pretendard'; letter-spacing:-1px;">
+                사주왕</h1>
+            <p style="color:#e0e0e0; font-size:1.1rem; letter-spacing:2px; margin-top:0.5rem;">THE SAJU KING</p>
+        </div>
+
+        <div class="glow-btn"
+            style="background:rgba(255,255,255,0.15); padding:1rem 2rem; border-radius:50px; color:white; backdrop-filter:blur(5px); border:1px solid rgba(255,255,255,0.2);">
+            <span class="blink">화면을 터치하세요</span>
+        </div>
+
+        <div style="position:absolute; bottom:2rem; color:rgba(255,255,255,0.4); font-size:0.8rem;">
+            © 2026 Saju King Corp.
+        </div>
+    </div>
+
+    <!-- SCREEN: LOGIN -->
+    <div id="screen-login" class="container hidden"
+        style="flex-direction:column; align-items:center; justify-content:center; padding:2rem; background: linear-gradient(135deg, var(--primary), #8e44ad);">
         <div style="text-align:center; color:white; margin-bottom:3rem;">
             <i class="fa-solid fa-crown bounce" style="font-size:4rem; color:#ffd700; margin-bottom:1rem;"></i>
             <h1 style="font-size:2rem; margin:0;">사주왕</h1>
-            <p style="opacity:0.8;">Saju King</p>
+            <p style="opacity:0.8;">로그인하여 시작하기</p>
         </div>
 
         <div style="width:100%; max-width:300px; display:flex; flex-direction:column; gap:10px;">
@@ -633,11 +802,33 @@
             <p>2030 압도적 1위! AI 사주 놀이터</p>
         </section>
 
-        <!-- Category Grid (Reorganized) -->
+        <!-- Image Category Grid (New) -->
         <h3 style="padding:0 1.5rem; margin-bottom:1rem; display:flex; align-items:center;">
-            <i class="fa-solid fa-fire" style="color:red; margin-right:5px;"></i> 인기 컨텐츠
+            <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary); margin-right:5px;"></i> 테마 운세
         </h3>
-        <div class="category-grid">
+        <div class="image-grid">
+            <div class="img-card" onclick="openInput('love')">
+                <img src="file:///C:/Users/5/.gemini/antigravity/brain/e032c0cf-ad76-4024-b3b0-de743a6ac7a6/uploaded_media_0_1769582613314.png"
+                    alt="대인관계운">
+                <div class="overlay">2월 대인관계운</div>
+            </div>
+            <div class="img-card" onclick="openInput('career')">
+                <img src="file:///C:/Users/5/.gemini/antigravity/brain/e032c0cf-ad76-4024-b3b0-de743a6ac7a6/uploaded_media_1_1769582613314.png"
+                    alt="적성운">
+                <div class="overlay">나한테 딱 맞는 일</div>
+            </div>
+            <div class="img-card" onclick="openInput('health')">
+                <img src="file:///C:/Users/5/.gemini/antigravity/brain/e032c0cf-ad76-4024-b3b0-de743a6ac7a6/uploaded_media_2_1769582613314.png"
+                    alt="건강운">
+                <div class="overlay">2월 건강운</div>
+            </div>
+        </div>
+
+        <!-- Classic Grid -->
+        <h3 style="padding:0 1.5rem; margin-bottom:1rem; display:flex; align-items:center;">
+            <i class="fa-solid fa-fire" style="color:red; margin-right:5px;"></i> 전체 메뉴
+        </h3>
+        <div class="category-grid" style="padding-top:0;">
             <div class="cat-item" onclick="openInput('total')">
                 <div class="cat-icon" style="position:relative;">
                     <i class="fa-solid fa-scroll"></i>
@@ -645,35 +836,17 @@
                 </div>
                 <span class="cat-label">평생운세</span>
             </div>
+            <div class="cat-item" onclick="openInput('tarot')">
+                <div class="cat-icon glow-btn"><i class="fa-solid fa-moon"></i></div>
+                <span class="cat-label">타로점</span>
+            </div>
+            <div class="cat-item" onclick="openInput('lotto')">
+                <div class="cat-icon"><i class="fa-solid fa-ticket" style="color:#4caf50;"></i></div>
+                <span class="cat-label">로또추첨</span>
+            </div>
             <div class="cat-item" onclick="openInput('year')">
                 <div class="cat-icon"><i class="fa-solid fa-seedling"></i></div>
                 <span class="cat-label">신년운세</span>
-            </div>
-            <div class="cat-item" onclick="openInput('gunghap')">
-                <div class="cat-icon"><i class="fa-solid fa-heart-pulse" style="color:#ff4081;"></i></div>
-                <span class="cat-label">궁합</span>
-            </div>
-            <div class="cat-item" onclick="openInput('tarot')">
-                <div class="cat-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                <span class="cat-label">타로</span>
-            </div>
-
-            <!-- Row 2 -->
-            <div class="cat-item" onclick="openInput('wealth')">
-                <div class="cat-icon"><i class="fa-solid fa-sack-dollar" style="color:gold;"></i></div>
-                <span class="cat-label">재물운</span>
-            </div>
-            <div class="cat-item" onclick="openInput('lotto')">
-                <div class="cat-icon glow-btn"><i class="fa-solid fa-ticket" style="color:#4caf50;"></i></div>
-                <span class="cat-label">로또추첨</span>
-            </div>
-            <div class="cat-item" onclick="openInput('star')">
-                <div class="cat-icon"><i class="fa-solid fa-star"></i></div>
-                <span class="cat-label">별자리</span>
-            </div>
-            <div class="cat-item" onclick="openInput('today')">
-                <div class="cat-icon"><i class="fa-regular fa-calendar-check"></i></div>
-                <span class="cat-label">오늘운세</span>
             </div>
         </div>
 
@@ -768,6 +941,38 @@
         </div>
     </div>
 
+    <!-- SCREEN: TAROT (Deep) -->
+    <div id="screen-tarot" class="container hidden" style="background:#1a1a2e; color:white;">
+        <header class="app-header" style="background:transparent; border:none; color:white;">
+            <div class="logo" onclick="goHome()" style="cursor:pointer; color:white;"><i
+                    class="fa-solid fa-arrow-left"></i> 나가기</div>
+        </header>
+
+        <div style="padding:1rem; text-align:center;">
+            <h2 style="color:#ffd700; margin-bottom:0.5rem;">신비의 타로</h2>
+            <p style="color:#aaa; font-size:0.9rem;">당신의 고민을 생각하며 카드를 한 장 선택하세요.</p>
+
+            <!-- Cards Deck -->
+            <div class="tarot-stage" id="tarot-deck">
+                <!-- JS will populate 3 cards -->
+            </div>
+
+            <!-- Tarot Result -->
+            <div id="tarot-result-area" class="hidden fade-in"
+                style="margin-top:2rem; background:rgba(255,255,255,0.1); border-radius:15px; padding:1.5rem;">
+                <img id="tarot-img" src=""
+                    style="width:150px; border-radius:10px; margin-bottom:1rem; box-shadow:0 0 15px rgba(255,215,0,0.3);">
+                <h3 id="tarot-name" style="color:#ffd700;">THE FOOL</h3>
+                <div style="text-align:left; font-size:0.95rem; line-height:1.6; color:#eee;">
+                    <p id="tarot-desc">...</p>
+                </div>
+                <button class="cta-btn" onclick="initTarot()"
+                    style="margin-top:1.5rem; background:transparent; border:1px solid rgba(255,255,255,0.3);">다른 카드
+                    뽑기</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCREEN: LOADING -->
     <div id="screen-loading" class="loading-screen hidden">
         <div
@@ -859,6 +1064,12 @@
         let selectedCategory = 'total';
         let currentUser = null;
 
+        // --- TITLE SCREEN ---
+        function goToLogin() {
+            document.getElementById('screen-splash').classList.add('hidden');
+            document.getElementById('screen-login').classList.remove('hidden');
+        }
+
         // --- AUTH ---
         function login(provider) {
             // Simulate Login
@@ -888,6 +1099,12 @@
                 document.getElementById('screen-lotto').classList.remove('hidden');
                 return;
             }
+            if (cat === 'tarot') {
+                document.getElementById('screen-home').classList.add('hidden');
+                document.getElementById('screen-tarot').classList.remove('hidden');
+                initTarot();
+                return;
+            }
             document.getElementById('screen-home').classList.add('hidden');
             document.getElementById('screen-input').classList.remove('hidden');
             window.scrollTo(0, 0);
@@ -897,6 +1114,7 @@
             document.getElementById('screen-result').classList.add('hidden');
             document.getElementById('screen-input').classList.add('hidden');
             document.getElementById('screen-lotto').classList.add('hidden');
+            document.getElementById('screen-tarot').classList.add('hidden');
             document.getElementById('screen-home').classList.remove('hidden');
         }
 
@@ -1222,6 +1440,66 @@
                 origin: { y: 0.6 },
                 colors: ['#fbc02d', '#0288d1', '#d32f2f']
             });
+        }
+
+        // Tarot Logic
+        const tarotData = [
+            { name: "0. The Fool (바보)", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg", desc: "새로운 시작, 모험, 순수함. 당신은 지금 막 새로운 여정을 시작하려 합니다. 두려움 없이 발걸음을 내딛으세요. 무한한 가능성이 기다리고 있습니다." },
+            { name: "I. The Magician (마법사)", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg", desc: "창조력, 기술, 의지. 당신은 목표를 달성할 수 있는 모든 도구와 능력을 갖추고 있습니다. 지금이 바로 행동을 취할 때입니다." },
+            { name: "II. The High Priestess (여사제)", img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg", desc: "직관, 신비, 지혜. 내면의 목소리에 귀를 기울이세요. 답은 당신 안에 있습니다. 서두르지 말고 침묵 속에서 지혜를 찾으세요." },
+            { name: "III. The Empress (여황제)", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg", desc: "풍요, 모성, 자연. 당신의 삶에 풍요로움과 창조적인 에너지가 넘치고 있습니다. 사랑과 예술, 자연을 즐기세요." },
+            { name: "VI. The Lovers (연인)", img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg", desc: "사랑, 조화, 선택. 중요한 관계나 선택의 기로에 서 있습니다. 마음이 끌리는 쪽을 따르되, 조화와 균형을 잃지 마세요." },
+            { name: "X. Wheel of Fortune (운명의 수레바퀴)", img: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg", desc: "변화, 운명, 전환점. 삶의 흐름이 바뀌고 있습니다. 이 변화는 피할 수 없으니, 흐름에 몸을 맡기고 긍정적으로 받아들이세요." },
+            { name: "XIX. The Sun (태양)", img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg", desc: "성공, 활력, 기쁨. 모든 것이 명확해지고 긍정적인 에너지가 넘칩니다. 당신의 성공과 행복이 눈앞에 있습니다." }
+        ];
+
+        function initTarot() {
+            const deck = document.getElementById('tarot-deck');
+            document.getElementById('tarot-result-area').classList.add('hidden');
+            deck.innerHTML = '';
+            deck.classList.remove('hidden');
+
+            // Create 3 Cards
+            for (let i = 0; i < 3; i++) {
+                const card = document.createElement('div');
+                card.className = 'card-container';
+                card.innerHTML = `
+                    <div class="front"><i class="fa-solid fa-star" style="color:gold; font-size:2rem;"></i></div>
+                    <div class="back"><img src="" style="width:100%; height:100%; object-fit:cover;"></div>
+                `;
+                card.onclick = () => flipCard(card);
+                deck.appendChild(card);
+            }
+        }
+
+        function flipCard(cardEl) {
+            if (cardEl.classList.contains('flipped')) return;
+
+            // Random Tarot
+            const pick = tarotData[Math.floor(Math.random() * tarotData.length)];
+
+            // Update Card Back Image
+            const backImg = cardEl.querySelector('.back img');
+            backImg.src = pick.img;
+
+            // Flip Animation
+            cardEl.classList.add('flipped');
+
+            // Show Description after delay
+            setTimeout(() => {
+                document.getElementById('tarot-deck').classList.add('hidden');
+                const area = document.getElementById('tarot-result-area');
+                document.getElementById('tarot-img').src = pick.img;
+                document.getElementById('tarot-name').innerText = pick.name;
+                document.getElementById('tarot-desc').innerText = pick.desc;
+                area.classList.remove('hidden');
+
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.6 }
+                });
+            }, 800);
         }
     </script>
 </body>

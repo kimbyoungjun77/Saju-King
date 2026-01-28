@@ -924,6 +924,9 @@
                             <div class="radio-btn" onclick="selectRadio('gender', 'female', this)">여성</div>
                         </div>
                         <input type="hidden" id="gender" value="male">
+                        <!-- Hidden API Key Input -->
+                        <input type="hidden" id="api_key"
+                            value="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">
                     </div>
 
                     <div class="input-group">
@@ -1120,9 +1123,14 @@
         integrity="sha384-l+xbElFSnP5k7wJKz52J1GOvbIV1x1i2cQ2p1OdyKdAZM0sRM5CGhC8PF28hX61j"
         crossorigin="anonymous"></script>
     <script>
+        // API CONFIGURATION
+        const KAKAO_KEY = '812c6b3379ca1c8abb83f9bc397f61d3';
+        const NAVER_CLIENT_ID = 'IvutropDRU0EXHKlT5fY';
+        const NAVER_CLIENT_SECRET = 'KL65DG3lGs'; // Caution: Client Secret in frontend
+
         // Kakao Init
         try {
-            Kakao.init('0b22a360c885cdccf589e74be85b6710');
+            Kakao.init(KAKAO_KEY);
         } catch (e) { console.log('Kakao Init Err', e); }
 
         const CHEONGAN = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'];
